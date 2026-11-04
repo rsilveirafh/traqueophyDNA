@@ -1,0 +1,60 @@
+name: Adotar uma espécie
+description: Quero sequenciar uma espécie que ainda não tem DNA público.
+title: "Adoção: "
+labels: ["adocao"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Obrigado! "Adotar" é dizer em público que você vai sequenciar esta espécie, para evitar
+        esforço duplicado e ajudar a achar parceiros. Prefira **tecido já depositado em coleção**;
+        lembre do cadastro no **SisGen** (Lei 13.123/2015) e das autorizações de coleta.
+  - type: input
+    id: especie
+    attributes:
+      label: Espécie
+      description: Nome científico como aparece no painel.
+      placeholder: "Gênero epíteto"
+    validations:
+      required: true
+  - type: input
+    id: instituicao
+    attributes:
+      label: Instituição / laboratório
+    validations:
+      required: true
+  - type: dropdown
+    id: tecido
+    attributes:
+      label: Já existe tecido?
+      options:
+        - Sim, em coleção científica
+        - Sim, no meu laboratório
+        - Não, depende de coleta (com autorização)
+        - Não sei
+    validations:
+      required: true
+  - type: input
+    id: voucher
+    attributes:
+      label: Coleção e número de tombo (se houver)
+  - type: input
+    id: marcador
+    attributes:
+      label: Marcador previsto
+      placeholder: "rbcL, matK, ITS2, trnH-psbA, plastoma..."
+  - type: input
+    id: previsao
+    attributes:
+      label: Previsão de depósito no BOLD/GenBank
+      placeholder: "ex.: 2027-06"
+  - type: textarea
+    id: comentarios
+    attributes:
+      label: Comentários
+  - type: checkboxes
+    id: consentimento
+    attributes:
+      label: Exibição no painel
+      options:
+        - label: Autorizo mostrar a instituição no painel como responsável pela adoção.

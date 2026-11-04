@@ -1,0 +1,155 @@
+---
+pagetitle: "Fontes e método · traqueophyDNA"
+format: html
+---
+
+{{< include _comum.qmd >}}
+
+::: {.cc-cabeca}
+[Fontes e método]{.cc-chapeu}
+
+# Como o painel conta o DNA de cada espécie
+
+[De onde vêm as listas e as sequências, o que quer dizer cada situação e como evitamos a "falsa órfã".]{.cc-intro}
+:::
+
+## A pergunta
+
+Para cada espécie de **tetrápode do Brasil** (anfíbios, répteis, aves e mamíferos) nas listas
+oficiais das sociedades científicas: quantas sequências de DNA públicas existem no
+[BOLD Systems](https://boldsystems.org) e no [GenBank](https://www.ncbi.nlm.nih.gov/genbank/)? E
+quais espécies ainda **não têm nenhuma**? O recorte é de tetrápodes; peixes não entram.
+
+**O que o painel mede.** Sequências de DNA **depositadas** no BOLD ou no GenBank, de qualquer
+marcador (COI, cyt b, 16S, RAG-1, mitogenoma...). Não é um levantamento de genomas nem de bases de
+referência para eDNA: uma espécie com uma única sequência de 16S conta como "com DNA", mesmo que não
+sirva para todo primer de eDNA. Leituras brutas de sequenciamento (SRA) não contam como sequência
+depositada; elas aparecem só como uma marca, "só dados brutos" (ver abaixo).
+
+```{ojs}
+{
+  const n = conta(cobertura);
+  return md`Na última atualização (${status.atualizado_em}): **${fmtn(n.total)}** espécies,
+**${fmtn(n.com)}** com DNA público (${fmtpct(n.com / n.total)}), **${fmtn(n.sem)}** sem nenhum DNA
+encontrado e **${fmtn(n.verificar)}** a verificar. Das sem DNA e a verificar, **${fmtn(n.brutos)}** já
+têm leituras brutas no SRA.`;
+}
+```
+
+## Listas de espécies
+
+Uma lista de referência por grupo, todas convertidas para o mesmo esquema de colunas.
+
+```{ojs}
+md`| Grupo | Lista | Licença |
+|---|---|---|
+| Anfíbios | Drummond, L. O., Santana, D. J., Lima, L. M. C. & Toledo, L. F. (2026). *Lista de Anfíbios do Brasil*. Herpetologia Brasileira 15(2). [doi:10.5281/zenodo.18340087](https://doi.org/10.5281/zenodo.18340087). Dados estruturados do pacote [amphiBR](https://github.com/paulobarros/amphiBR) (P. Barros). UF, bioma, endemismo e as categorias DD/NT/LC vêm da lista anterior (Segalla et al. 2021, [doi:10.5281/zenodo.4716176](https://doi.org/10.5281/zenodo.4716176)) pelo nome de 2021; as espécies sem nome em 2021 recebem a UF do CTFB. | Listas CC-BY 4.0; pacote GPL ≥ 3 (só os dados são usados) |
+| Répteis | Entiauspe-Neto, O. M., Costa, H. C. & Guedes, T. B. [ReptiliaBR](https://github.com/omarentiauspe/ReptiliaBR) v0.4.0: lista e ocorrência por UF dos répteis do Brasil (SBH). Só ocorrências confirmadas ("X") entram no mapa. | MIT |
+| Aves | Pacheco, J. F. et al. (2021). *Annotated checklist of the birds of Brazil by the Brazilian Ornithological Records Committee*, 2ª ed. Ornithology Research 29: 94-105. Lista Primária. [doi:10.5281/zenodo.5138368](https://doi.org/10.5281/zenodo.5138368) | CC-BY 4.0 |
+| Mamíferos | Abreu, E. F. et al. *Lista de Mamíferos do Brasil* v2025-1. CT-SBMz. [doi:10.5281/zenodo.18378485](https://doi.org/10.5281/zenodo.18378485) | CC-BY 4.0 |
+
+Quando a lista registra o nome anterior de uma espécie (combinação antiga, sinônimo júnior), esse
+nome entra na busca de sequências junto com os sinônimos do CTFB e do GBIF: as 63 combinações novas
+da lista de anfíbios de 2026 (por exemplo, *Scinax agilis* → *Ololygon agilis*) não viram falsas
+órfãs. Espécies marinhas entram quando a
+lista do grupo as traz (tartarugas marinhas, aves marinhas, cetáceos, sirênios): nenhum filtro manual.`
+```
+
+## Sequências
+
+- **BOLD Systems** (portal v5): uma consulta por classe ao endpoint público
+  `api/summary`, que devolve o número de registros públicos por nome de espécie; outra consulta
+  igual, restrita a material coletado no Brasil. Sem chave.
+- **GenBank** (NCBI E-utilities, `esearch` no banco `nuccore`): contagem de registros por
+  `"Gênero epíteto"[Organism]`. O filtro `[Organism]` usa a taxonomia do NCBI e já inclui os
+  sinônimos que o NCBI conhece. Os nomes anteriores dados pela lista e os sinônimos do CTFB entram
+  na mesma busca com `OR`.
+- **SRA** (NCBI E-utilities, `esearch` no banco `sra`): só para as espécies sem sequência montada,
+  pelo campo Organism, com o nome da lista e as combinações do mesmo epíteto. Sinônimos com outro
+  epíteto ficam de fora, para não contar dados de uma espécie-mãe desmembrada. Não muda a situação.
+- **Catálogo Taxonômico da Fauna do Brasil** ([CTFB/JBRJ](https://fauna.jbrj.gov.br), API REST
+  aberta): sinônimos, ocorrência por UF (usada para aves, e para anfíbios sem UF na lista),
+  endemismo e ano de descrição quando a lista não traz.
+- **GBIF Backbone** ([api.gbif.org](https://techdocs.gbif.org/en/openapi/v1/species)): para as
+  espécies sem DNA sob o nome da lista, o nome aceito no GBIF e os sinônimos dele (pega
+  transferências de gênero, como *Heterospizias meridionalis* / *Buteogallus meridionalis*). Se o
+  GBIF não reconhece o nome, nada é inventado: a espécie fica "a verificar".
+- **Categoria nacional de ameaça:** Portaria MMA nº 1.704, de 16/06/2026 (Lista Nacional Oficial
+  das Espécies da Fauna Ameaçadas de Extinção, Anexo I), extraída do PDF publicado no DOU. Espécie
+  com só subespécies listadas aparece como "categoria (ssp.)". Quando a espécie não consta da
+  portaria, mantêm-se as categorias DD/NT/LC das avaliações citadas pelas listas (MMA 2022 para
+  anfíbios, MMA 2023 para mamíferos).
+- Mapa: malha de UFs do [IBGE](https://servicodados.ibge.gov.br/api/docs/malhas) (qualidade mínima).
+
+## Situação de cada espécie
+
+| Situação | Critério |
+|---|---|
+| **com DNA** | ao menos um registro no BOLD ou no GenBank **sob o nome da lista** ou sob outra combinação do **mesmo epíteto** (transferência de gênero; a observação diz qual) |
+| **a verificar** | sem DNA sob o nome da lista, mas: há sequências só sob nome alternativo com outro epíteto (sinônimo, nome aceito no CTFB ou no GBIF; pode ser desmembramento ou agrupamento de espécies); ou o nome não está no CTFB ou não é reconhecido pelo GBIF (não deu para conferir sinônimos); ou o nome da lista é sinônimo no CTFB; ou o nome aparece no GenBank fora do campo Organism (nota, subespécie, identificação antiga); ou o gênero tem 500 registros ou mais no GenBank |
+| **sem DNA** | nenhuma sequência depositada sob o nome e os sinônimos conhecidos, e nenhum dos sinais acima |
+
+**Só dados brutos** é uma marca, não uma situação. Vai nas espécies "sem DNA" ou "a verificar" que
+têm leituras de sequenciamento públicas no SRA (captura de UCE, ddRAD, RNA-Seq, genoma) e nenhuma
+sequência montada no BOLD ou no GenBank. Elas seguem na lacuna, mas quem for adotar pode começar
+montando o que já existe.
+
+**Ter sinônimos não é motivo para "a verificar".** Todos os sinônimos conhecidos (da lista, do CTFB
+e do GBIF) entram na busca do BOLD e do GenBank. Se nenhum deles tem sequência, a espécie é "sem
+DNA", e a observação lista os sinônimos buscados para quem quiser conferir. Até a atualização de
+2026-10-30, ter sinônimos bastava para "a verificar". Com a mudança, 91 espécies passaram para "sem
+DNA" (45 répteis, 22 aves, 14 anfíbios e 10 mamíferos), e o histórico dessa data foi recalculado
+com a regra nova. As datas anteriores no `data/historico.csv` seguem a regra antiga.
+
+**Cuidado com a "falsa órfã".** Uma espécie pode parecer sem DNA porque o banco usa um nome antigo,
+um nome com erro ou uma identificação só até gênero ("*Gênero* sp."). Por isso o painel nunca afirma
+"não existe DNA": afirma que **não foi encontrado sob os nomes conferidos**. A coluna "Observação"
+diz o motivo de cada "a verificar" e quantos registros do gênero coletados no Brasil estão sem
+identificação no BOLD. Achou uma sequência que o painel não viu? Abra uma issue com o link.
+
+Faixas de registros no BOLD seguem o [iBOL Europe Gap List](https://species.iboleurope.org):
+0 / 1-2 / 3-9 / 10 ou mais. A ideia de ranquear lacunas vem de lá.
+
+## Validação
+
+Para medir o erro, sorteamos 120 espécies dos dados de 2026-10-30 (50 sem DNA, 50 a verificar e 20
+com DNA, proporcionais ao tamanho de cada grupo) e conferimos cada uma por caminhos diferentes dos
+do pipeline: taxonomia do NCBI, busca pelo taxid, texto livre do GenBank, o epíteto em gêneros
+antigos, o SRA e os nomes parecidos no BOLD.
+
+- **Nenhuma falsa órfã** entre as 50 sem DNA e **nenhum falso positivo** entre as 20 com DNA, para
+  sequências depositadas.
+- **14 das 50 sem DNA tinham leituras brutas no SRA.** Foi isso que levou à marca "só dados brutos".
+- **Das 50 a verificar, 37 eram sem DNA,** 6 tinham DNA sob um gênero antigo ou nome trinomial que
+  nenhuma fonte de sinônimos conhecia, 4 só dados brutos e 3 eram desmembramentos de fato duvidosos.
+  O alerta "nome não reconhecido no GBIF" achou 5 das 6; "gênero muito sequenciado", sozinho,
+  nenhuma.
+
+A conferência foi assistida por IA e está passando por auditoria humana. Método, planilhas e
+scripts em [`validacao/`](https://github.com/rsilveirafh/traqueophyDNA/tree/main/validacao).
+
+## Atualização
+
+Um robô (GitHub Actions) roda toda semana: baixa as listas, consulta CTFB, BOLD, GenBank e SRA e grava
+os resultados em CSV no repositório. O histórico do git é o histórico dos dados. A consulta ao
+GenBank é incremental: espécies novas e as sem DNA são reconsultadas toda semana; as demais, a cada
+4 semanas.
+
+## Imagens
+
+- **Silhuetas** dos grupos: [PhyloPic](https://www.phylopic.org). *Rhinella marina* (Dennis C. Murphy),
+  *Tropidurus itambere* (Heitor Campos de Sousa) e *Myrmecophaga tridactyla* (Steven Traver), CC0 1.0;
+  *Pitangus sulphuratus* (Kai Caspar), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+- **Fotos** das espécies: foto padrão do táxon no [iNaturalist](https://www.inaturalist.org), só
+  quando tem licença Creative Commons. O autor e a licença aparecem em cada foto.
+
+## Dados e código
+
+- [cobertura.csv](data/cobertura.csv): uma linha por espécie (contagens, situação, observação).
+- [historico.csv](data/historico.csv): totais por grupo a cada atualização.
+- [eventos.csv](data/eventos.csv): espécies que ganharam DNA, com a data.
+
+```{ojs}
+md`Código e dados no [GitHub](${REPO}). Código sob licença MIT; tabelas derivadas sob CC-BY 4.0
+(cite as listas originais e este painel).`
+```

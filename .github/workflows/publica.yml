@@ -1,0 +1,53 @@
+name: Publica site
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "*.qmd"
+      - "_quarto.yml"
+      - "estilo.scss"
+      - "data/**"
+      - ".github/workflows/publica.yml"
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # `ref: main` para pegar o commit de dados feito pelo workflow de atualização.
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: quarto-dev/quarto-actions/setup@v2
+
+      # As páginas usam só OJS (JavaScript no navegador): o render não precisa de R.
+      - name: Render
+        run: quarto render
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

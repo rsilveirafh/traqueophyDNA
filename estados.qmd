@@ -1,0 +1,189 @@
+---
+pagetitle: "Por estado · traqueophyDNA"
+description: "Espécies de plantas vasculares sem DNA público por estado do Brasil."
+format:
+  html:
+    page-layout: full
+---
+
+{{< include _comum.qmd >}}
+
+::: {.cc-cabeca}
+[Por estado]{.cc-chapeu}
+
+# Onde estão as espécies sem DNA
+
+[Uma espécie entra em todos os estados onde ocorre. Ocorrência por UF: listas de anfíbios (amphiBR, pelo nome de 2021; espécies novas pelo CTFB), répteis (ReptiliaBR) e mamíferos (SBMz); para aves, o CTFB. ${fmtn(sem_uf)} espécies do recorte não têm UF em nenhuma fonte e ficam fora do mapa.]{.cc-intro}
+:::
+
+::: {.cc-filtros}
+```{ojs}
+viewof grupo = Inputs.radio(OPCOES_GRUPO, {label: "Grupo", value: "Todos"})
+```
+
+```{ojs}
+viewof metrica = Inputs.radio(["espécies sem DNA", "% sem DNA", "espécies na lista"], {label: "Cor do mapa", value: "espécies sem DNA"})
+```
+
+```{ojs}
+viewof com_verificar = Inputs.checkbox(["somar \"a verificar\""], {label: "Sem DNA"})
+```
+:::
+
+```{ojs}
+//| output: false
+sel = filtra_grupo(cobertura, grupo)
+```
+
+```{ojs}
+//| output: false
+sem_uf = sel.filter(d => d.ufs_lista.length === 0).length
+```
+
+```{ojs}
+//| output: false
+eh_sem = d => d.situacao === "sem DNA" || (com_verificar.length > 0 && d.situacao === "a verificar")
+```
+
+```{ojs}
+//| output: false
+NOME_UF = Object.fromEntries("AC:Acre|AL:Alagoas|AP:Amapá|AM:Amazonas|BA:Bahia|CE:Ceará|DF:Distrito Federal|ES:Espírito Santo|GO:Goiás|MA:Maranhão|MT:Mato Grosso|MS:Mato Grosso do Sul|MG:Minas Gerais|PA:Pará|PB:Paraíba|PR:Paraná|PE:Pernambuco|PI:Piauí|RJ:Rio de Janeiro|RN:Rio Grande do Norte|RS:Rio Grande do Sul|RO:Rondônia|RR:Roraima|SC:Santa Catarina|SP:São Paulo|SE:Sergipe|TO:Tocantins".split("|").map(x => x.split(":")))
+```
+
+```{ojs}
+//| output: false
+COD_UF = Object.fromEntries("11:RO|12:AC|13:AM|14:RR|15:PA|16:AP|17:TO|21:MA|22:PI|23:CE|24:RN|25:PB|26:PE|27:AL|28:SE|29:BA|31:MG|32:ES|33:RJ|35:SP|41:PR|42:SC|43:RS|50:MS|51:MT|52:GO|53:DF".split("|").map(x => x.split(":")))
+```
+
+```{ojs}
+//| output: false
+por_uf = Object.keys(NOME_UF).map(uf => {
+  const sp = sel.filter(d => d.ufs_lista.includes(uf));
+  const sem = sp.filter(eh_sem).length;
+  return {uf, nome: NOME_UF[uf], total: sp.length, com: sp.filter(d => d.situacao === "com DNA").length,
+          verificar: sp.filter(d => d.situacao === "a verificar").length,
+          brutos: sp.filter(d => eh_sem(d) && d.brutos).length,
+          sem, pct: sp.length ? sem / sp.length : 0};
+})
+```
+
+```{ojs}
+//| output: false
+valor = d => metrica === "% sem DNA" ? d.pct : metrica === "espécies na lista" ? d.total : d.sem
+```
+
+```{ojs}
+//| output: false
+geo = {
+  // A malha do IBGE segue a regra da mão direita (RFC 7946); o d3-geo espera o
+  // sentido oposto. Inverte os anéis de cada polígono que "cobre o mundo".
+  const g = await FileAttachment("data-raw/uf_ibge.geojson").json();
+  for (const f of g.features) {
+    if (d3.geoArea(f) > 2 * Math.PI) {
+      const polys = f.geometry.type === "Polygon" ? [f.geometry.coordinates] : f.geometry.coordinates;
+      for (const p of polys) for (const r of p) r.reverse();
+    }
+  }
+  return g;
+}
+```
+
+```{ojs}
+//| output: false
+// Estado clicado no mapa ou no ranking (null = mostra o ranking).
+mutable uf_sel = null
+```
+
+```{ojs}
+//| output: false
+escolhe_uf = uf => {
+  mutable uf_sel = uf;
+  // No celular o painel fica embaixo do mapa: rola até ele.
+  if (uf && window.innerWidth < 992) {
+    setTimeout(() => document.querySelector(".cc-ranking")?.scrollIntoView({behavior: "smooth", block: "start"}), 60);
+  }
+}
+```
+
+[Passe o mouse sobre um estado para ver os números. Clique nele (ou no nome, no ranking) para ver a lista de espécies.]{.nota-pequena}
+
+::: {.cc-mapa-tabela}
+::: {.cc-mapa}
+```{ojs}
+{
+  const idx = new Map(por_uf.map(d => [d.uf, d]));
+  const feats = geo.features.map(f => ({...f, properties: {...f.properties, ...idx.get(COD_UF[f.properties.codarea])}}));
+  const fc = {type: "FeatureCollection", features: feats};
+  const w = Math.min(width, 680);
+  const mapa = Plot.plot({
+    width: w, height: w * 0.97, style: {fontFamily: "Inter, sans-serif", fontSize: "12px", background: "transparent"},
+    projection: {type: "mercator", domain: fc},
+    color: {type: "linear", range: ["#f1e8d6", "#9a4322"], legend: true, label: metrica,
+            tickFormat: metrica === "% sem DNA" ? fmtpct : fmtn},
+    marks: [
+      Plot.geo(fc, {fill: f => valor(f.properties), stroke: "var(--cc-papel)", strokeWidth: 1,
+        tip: {fontFamily: "Inter, sans-serif"},
+        title: f => `${f.properties.nome}
+${fmtn(f.properties.total)} espécies
+${fmtn(f.properties.sem)} sem DNA (${fmtpct(f.properties.pct)})
+${fmtn(f.properties.verificar)} a verificar
+${fmtn(f.properties.brutos)} das sem DNA só com dados brutos
+clique para ver a lista`}),
+      Plot.geo(feats.filter(f => f.properties.uf === uf_sel), {stroke: "var(--cc-tinta)", strokeWidth: 2.5}),
+      Plot.text(fc.features, Plot.centroid({text: f => f.properties.uf, fill: "#1d2421", stroke: "#f7f4ec",
+        strokeWidth: 3, fontSize: 10, fontWeight: 600, pointerEvents: "none"}))
+    ]
+  });
+  // Clique no estado: um path por feição, na mesma ordem de feats.
+  mapa.querySelector('g[aria-label="geo"]').querySelectorAll("path").forEach((p, i) => {
+    p.addEventListener("click", () => escolhe_uf(feats[i].properties.uf));
+  });
+  return mapa;
+}
+```
+:::
+
+::: {.cc-ranking}
+```{ojs}
+{
+  if (uf_sel) {
+    const d = por_uf.find(x => x.uf === uf_sel);
+    const lista = sel.filter(x => x.ufs_lista.includes(uf_sel) && eh_sem(x))
+      .sort((a, b) => d3.ascending(a.situacao === "sem DNA" ? 0 : 1, b.situacao === "sem DNA" ? 0 : 1) ||
+                      d3.ascending(a.prioridade, b.prioridade) ||
+                      d3.ascending(a.ano_descricao ?? 9999, b.ano_descricao ?? 9999) ||
+                      d3.ascending(a.especie, b.especie));
+    const voltar = htl.html`<button class="cc-cta cc-pequeno" type="button">← Ranking</button>`;
+    voltar.onclick = () => escolhe_uf(null);
+    const ameaca = c => c && AMEACADAS.has(c) || c === "DD" ? htl.html`<span class="cc-chip cc-${c.toLowerCase()}">${c}</span>` : "";
+    return htl.html`<div class="cc-uf-painel">
+      <div class="cc-uf-topo"><span class="cc-chapeu">${grupo === "Todos" ? "Plantas vasculares" : grupo} · ${com_verificar.length ? "sem DNA e a verificar" : "sem DNA"}</span>${voltar}</div>
+      <h3>${d.nome}</h3>
+      <p class="cc-uf-resumo"><b>${fmtn(lista.length)}</b> de ${fmtn(d.total)} espécies registradas no estado${
+        com_verificar.length ? "" : htl.html`; outras ${fmtn(d.verificar)} estão a verificar (marque "somar a verificar" para listá-las)`}.</p>
+      ${lista.length ? htl.html`<ul class="cc-uf-especies">${lista.map(x => htl.html`<li>
+        <a href="${link_adote(x.especie)}" target="_blank" title="Adotar esta espécie"><em>${x.especie}</em></a>
+        <span class="cc-uf-chips">${com_verificar.length ? selo_situacao(x.situacao) : ""}${selo_brutos(x)}${ameaca(x.categoria_ameaca)}${x.endemica ? htl.html`<span class="cc-chip">endêmica</span>` : ""}</span>
+        <small>${x.grupo_rotulo} · ${x.familia}${x.ano_descricao ? ` · ${x.ano_descricao}` : ""}</small>
+      </li>`)}</ul>` : htl.html`<p>Nenhuma espécie com estes filtros.</p>`}
+      <p class="nota-pequena">Clique no nome para adotar. Para filtrar por família ou buscar, use <a href="especies.html">Espécies sem DNA</a>.</p>
+    </div>`;
+  }
+  const linhas = por_uf.slice().sort((a, b) => d3.descending(valor(a), valor(b)));
+  const max = d3.max(linhas, valor) || 1;
+  const fmtv = metrica === "% sem DNA" ? fmtpct : fmtn;
+  return htl.html`<p class="cc-chapeu">Ranking · ${metrica}${com_verificar.length && metrica !== "espécies na lista" ? " (com a verificar)" : ""}</p><ol class="cc-ufs">${linhas.map(d => {
+    const li = htl.html`<li class="cc-clicavel" tabindex="0" role="button" title="Ver as espécies de ${d.nome}">
+      <span class="cc-uf-nome">${d.nome}</span>
+      <span class="cc-uf-barra"><i style="width:${100 * valor(d) / max}%"></i></span>
+      <span class="cc-uf-valor">${fmtv(valor(d))}</span>
+      <span class="cc-uf-detalhe">${fmtn(d.total)} espécies · ${fmtn(d.verificar)} a verificar</span>
+    </li>`;
+    li.onclick = () => escolhe_uf(d.uf);
+    li.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); escolhe_uf(d.uf); } };
+    return li;
+  })}</ol>`;
+}
+```
+:::
+:::

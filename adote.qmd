@@ -1,0 +1,80 @@
+---
+pagetitle: "Adote uma espécie · traqueophyDNA"
+description: "Escolha uma espécie brasileira sem DNA público e diga que vai sequenciá-la."
+format: html
+---
+
+{{< include _comum.qmd >}}
+
+::: {.cc-cabeca}
+[Adote uma espécie]{.cc-chapeu}
+
+# Diga em público: eu vou sequenciar esta espécie
+
+[Centenas de espécies de anfíbios, répteis, aves e mamíferos do Brasil ainda não têm **nenhuma sequência de DNA pública**. Muitas já têm tecido guardado em coleções, esperando alguém com uma pergunta (ou um edital) para sequenciar. Adotar evita esforço duplicado e ajuda a achar parceiros.]{.cc-intro}
+:::
+
+## Como adotar
+
+::: {.cc-passos}
+::: {.cc-passo}
+### Escolha
+
+Encontre a espécie em [Espécies sem DNA](especies.qmd): filtre por estado, grupo, família, endêmicas ou ameaçadas.
+:::
+
+::: {.cc-passo}
+### Clique em adotar
+
+Abre um formulário no GitHub (precisa de uma conta gratuita) já com o nome da espécie.
+:::
+
+::: {.cc-passo}
+### Conte o plano
+
+Instituição, se já há tecido em coleção e o marcador previsto (COI, cyt b, 16S, genoma...).
+:::
+
+::: {.cc-passo}
+### Acompanhe
+
+Revisado o pedido, a espécie ganha o selo **adotada**. Quando a primeira sequência aparecer no BOLD ou no GenBank, o robô semanal detecta e ela vira **sequenciada**.
+:::
+:::
+
+```{ojs}
+htl.html`<div class="cc-ctas" style="justify-content:flex-start">
+<a class="cc-cta cc-principal" href="${REPO}/issues/new?template=adote.yml" target="_blank">Abrir um pedido de adoção</a>
+<a class="cc-cta" href="${REPO}/issues?q=label%3Aadotada" target="_blank">Ver adoções no GitHub</a></div>`
+```
+
+Sem conta no GitHub? Fale com o mantenedor pelo perfil [\@rsilveirafh](https://github.com/rsilveirafh):
+ele registra a adoção por você.
+
+## Boas práticas
+
+- **Priorize tecido já depositado em coleções científicas.** Este painel não é convite para coletar
+  espécie ameaçada.
+- **Patrimônio genético:** acesso a material genético de espécie nativa para pesquisa exige cadastro no
+  [SisGen](https://sisgen.gov.br/) (Lei nº 13.123/2015). Coleta exige autorização (SISBIO).
+- **Deposite as sequências** em base pública (BOLD e/ou GenBank) com o voucher citado. Só assim a
+  espécie sai da lista.
+- **Confira o nome antes:** espécies marcadas como "a verificar" podem ter sequências sob nome antigo.
+- **Veja se já há dados brutos:** espécies com a marca "só dados brutos" têm leituras de
+  sequenciamento no SRA que ninguém montou. Montar e depositar um marcador a partir delas pode
+  bastar, sem nova coleta.
+  Se achar uma, abra uma issue com o link: a correção vale tanto quanto uma adoção.
+
+## Espécies adotadas
+
+```{ojs}
+{
+  if (!adocoes.length) return md`Nenhuma adoção registrada ainda. A primeira pode ser a sua.`;
+  return Inputs.table(adocoes, {
+    columns: ["especie", "situacao", "instituicao", "desde", "issue"],
+    header: {especie: "Espécie", situacao: "Situação", instituicao: "Instituição", desde: "Desde", issue: "Pedido"},
+    format: {especie: d => htl.html`<em>${d}</em>`, issue: d => d ? htl.html`<a href="${d}">link</a>` : ""},
+    select: false
+  });
+}
+```

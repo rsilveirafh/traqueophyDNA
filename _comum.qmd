@@ -1,0 +1,82 @@
+```{ojs}
+//| output: false
+// Dados e utilidades compartilhados por todas as páginas (incluído com {{< include >}}).
+cobertura_bruta = FileAttachment("data/cobertura.csv").csv({typed: true})
+adocoes = FileAttachment("data/adocoes.csv").csv({typed: true})
+status = FileAttachment("data/status.json").json()
+
+REPO = "{{< meta website.repo-url >}}"
+
+ROTULO_GRUPO = new Map([
+  ["anfibios", "Anfíbios"], ["repteis", "Répteis"],
+  ["aves", "Aves"], ["mamiferos", "Mamíferos"]
+])
+OPCOES_GRUPO = ["Todos", ...ROTULO_GRUPO.values()]
+GRUPO_POR_ROTULO = new Map([...ROTULO_GRUPO].map(([k, v]) => [v, k]))
+
+// Cores de situação (as mesmas de tema-claro.scss; tons médios que funcionam
+// no claro e no escuro): sálvia / ocre / terracota. E uma cor por grupo.
+SITUACOES = ["com DNA", "a verificar", "sem DNA"]
+COR_SITUACAO = ["#8fae8f", "#d6a23a", "#c4633a"]
+COR_GRUPO = ["#2f6b4f", "#b8532c", "#c99a2e", "#5b6f8a"]
+
+AMEACADAS = new Set(["CR", "EN", "VU"])
+
+cobertura = {
+  const adot = new Map(adocoes.map(a => [a.especie, a]));
+  return cobertura_bruta.map(d => {
+    const a = adot.get(d.especie);
+    const ufs = d.ufs ? String(d.ufs).split(";") : [];
+    const cat = d.categoria_ameaca ?? "";
+    return {
+      ...d,
+      grupo_rotulo: ROTULO_GRUPO.get(d.grupo),
+      ufs_lista: ufs,
+      endemica: d.endemica_br === true || d.endemica_br === "TRUE",
+      ameacada: AMEACADAS.has(cat),
+      // leituras brutas no SRA, sem sequência montada (marca, não é situação)
+      brutos: d.dados_brutos === true || d.dados_brutos === "TRUE",
+      adocao: a ? a.situacao : null,
+      adotada_por: a ? a.instituicao : null,
+      // prioridade: ameaçada > DD > endêmica > descrita há mais tempo
+      prioridade: (AMEACADAS.has(cat) ? 0 : cat === "DD" ? 1 : 2) * 10 +
+                  (d.endemica_br === true || d.endemica_br === "TRUE" ? 0 : 1)
+    };
+  });
+}
+
+filtra_grupo = (dados, rotulo) =>
+  rotulo === "Todos" ? dados : dados.filter(d => d.grupo === GRUPO_POR_ROTULO.get(rotulo))
+
+fmt = d3.format(",d")
+fmtpct = d3.format(".0%")
+fmtn = n => n == null ? "" : fmt(n).replace(/,/g, ".")
+
+conta = dados => {
+  const c = d3.rollup(dados, v => v.length, d => d.situacao);
+  return {
+    total: dados.length,
+    com: c.get("com DNA") ?? 0,
+    verificar: c.get("a verificar") ?? 0,
+    sem: c.get("sem DNA") ?? 0,
+    brutos: dados.filter(d => d.brutos).length
+  };
+}
+
+link_adote = especie =>
+  `${REPO}/issues/new?template=adote.yml&title=${encodeURIComponent("Adoção: " + especie)}&especie=${encodeURIComponent(especie)}`
+
+link_sra = especie =>
+  `https://www.ncbi.nlm.nih.gov/sra/?term=${encodeURIComponent('"' + especie + '"[Organism]')}`
+
+// Marca das espécies sem sequência montada que têm leituras brutas no SRA.
+selo_brutos = d => d.brutos
+  ? htl.html`<a class="cc-chip cc-brutos" href="${link_sra(d.especie)}" target="_blank" title="Há leituras de sequenciamento no SRA, mas nenhuma sequência montada no BOLD ou no GenBank">só dados brutos</a>`
+  : ""
+
+selo_situacao = s => {
+  const cls = s === "com DNA" ? "com" : s === "sem DNA" ? "sem" : "verificar";
+  const ico = s === "com DNA" ? "✓" : s === "sem DNA" ? "✕" : "?";
+  return htl.html`<span class="situacao ${cls}">${ico} ${s}</span>`;
+}
+```

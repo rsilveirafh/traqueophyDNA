@@ -1,0 +1,285 @@
+/*-- scss:defaults --*/
+// Regras comuns aos dois temas; as cores vêm de tema-claro.scss / tema-escuro.scss.
+$font-family-serif: "Source Serif 4", Georgia, "Iowan Old Style", serif;
+$font-family-sans-serif: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+$font-family-base: $font-family-serif;
+$headings-font-family: "Fraunces", Georgia, serif;
+$headings-font-weight: 600;
+$font-size-base: 1.0625rem;
+$line-height-base: 1.6;
+$border-radius: .5rem;
+
+/*-- scss:rules --*/
+:root {
+  --cc-tinta: #{$cc-tinta};
+  --cc-papel: #{$cc-papel};
+  --cc-cartao: #{$cc-cartao};
+  --cc-regua: #{$cc-regua};
+  --cc-apagado: #{$cc-apagado};
+  --cc-mata: #{$cc-mata};
+  --cc-com: #{$cc-com};
+  --cc-verificar: #{$cc-verificar};
+  --cc-sem: #{$cc-sem};
+  --cc-brutos: #{$cc-brutos};
+  --plot-background: #{$cc-papel};
+}
+
+// Interface (navegação, botões, tabelas, gráficos) em sem serifa; texto corrido em serifada.
+.navbar, .btn, .form-control, .form-select, label, table, .sidebar, .card-header,
+.value-box-title, .nota-pequena, .cc-rotulo, .cc-cta, figcaption, .page-footer, svg {
+  font-family: $font-family-sans-serif;
+}
+.navbar-brand { font-family: $headings-font-family; font-weight: 600; letter-spacing: .01em; }
+.navbar-brand img { height: 26px; }
+h1, h2, h3 { letter-spacing: -.01em; }
+.cc-num, table td, .value-box-value { font-variant-numeric: tabular-nums lining-nums; }
+
+// Selos de situação: fundo suave, texto escuro.
+.situacao { display: inline-block; padding: .05em .55em; border-radius: 999px; font-size: .82em;
+  white-space: nowrap; font-family: $font-family-sans-serif; font-weight: 500;
+  border: 1px solid transparent; }
+.situacao.com { background: rgba($cc-com, .22); border-color: rgba($cc-com, .6); }
+.situacao.verificar { background: rgba($cc-verificar, .2); border-color: rgba($cc-verificar, .65); }
+.situacao.sem { background: rgba($cc-sem, .16); border-color: rgba($cc-sem, .6); color: $cc-sem; }
+.selo { display: inline-block; padding: 0 .45em; margin-left: .3em; border-radius: 999px; font-size: .78em;
+  border: 1px solid currentColor; font-family: $font-family-sans-serif; }
+.btn-adote { white-space: nowrap; }
+.nota-pequena { font-size: .85em; color: $cc-apagado; }
+.valor-grande { font-size: 2.2rem; font-weight: 600; line-height: 1.1; }
+.vb-claro, .vb-claro .value-box-title, .vb-claro .value-box-value, .vb-claro .value-box-showcase { color: #fff !important; }
+.cell-output-display svg { max-width: 100%; height: auto; }
+@media (max-width: 576px) {
+  .bslib-value-box .value-box-value { font-size: 1.6rem !important; }
+  .bslib-value-box .value-box-showcase { display: none !important; }
+}
+
+// Páginas em formato dashboard: barra lateral e cabeçalhos de cartão no tom do papel.
+.bslib-sidebar-layout > .sidebar, .quarto-dashboard .sidebar { background: $cc-cartao !important; border-right: 1px solid $cc-regua; }
+.quarto-dashboard .card { background: $cc-cartao; border-color: $cc-regua; }
+.quarto-dashboard .card-header { background: transparent; border-bottom: 1px solid $cc-regua;
+  font-family: $headings-font-family; font-weight: 600; }
+.quarto-dashboard .quarto-dashboard-content svg[class^="plot-"] { background: transparent; }
+
+// ---------------------------------------------------------------------------
+// Capa (index.qmd)
+// ---------------------------------------------------------------------------
+.cc-capa { text-align: center; padding: 3.5rem 0 1.5rem; }
+.cc-capa .cc-logo { width: 120px; height: auto; margin-bottom: 1.25rem; }
+// Logo da capa: versão tinta no tema claro, versão papel no escuro.
+body.quarto-light .cc-so-escuro, body.quarto-dark .cc-so-claro { display: none; }
+.cc-capa h1 { font-size: clamp(2.6rem, 6vw, 4.2rem); font-weight: 700; margin: 0 0 .5rem; }
+.cc-capa .cc-lede { font-size: clamp(1.15rem, 2.2vw, 1.4rem); max-width: 38rem; margin: 0 auto;
+  color: $cc-apagado; }
+.cc-capa .cc-lede strong { color: $cc-tinta; }
+
+.cc-ctas { display: flex; flex-wrap: wrap; justify-content: center; gap: .6rem .8rem; margin: 1.8rem 0 .5rem; }
+.cc-ctas > p { display: contents; }
+.cc-cta { display: inline-flex; align-items: center; gap: .45rem; padding: .5rem 1.2rem;
+  border: 1.5px solid $cc-mata; border-radius: 999px; color: $cc-mata-link; text-decoration: none;
+  font-size: .95rem; font-weight: 500; transition: background .15s ease, transform .15s ease; }
+.cc-cta:hover, .cc-cta:focus-visible { background: rgba($cc-mata, .12); color: $cc-mata-link; transform: translateY(-1px); }
+.cc-cta.cc-principal { background: $cc-mata; color: $cc-papel; }
+.cc-cta.cc-principal:hover { background: $cc-mata-link; color: $cc-papel; }
+
+.cc-numeros { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; margin: 2.5rem 0 1rem;
+  border-top: 1px solid $cc-regua; border-bottom: 1px solid $cc-regua; }
+.cc-numeros > div { padding: 1.1rem .75rem; text-align: center; }
+.cc-numeros > div + div { border-left: 1px solid $cc-regua; }
+.cc-numeros .cc-num { display: block; font-family: $headings-font-family; font-size: clamp(1.7rem, 4vw, 2.6rem);
+  font-weight: 600; line-height: 1.1; }
+.cc-numeros .cc-rotulo { display: block; font-size: .8rem; text-transform: uppercase; letter-spacing: .08em;
+  color: $cc-apagado; margin-top: .3rem; }
+.cc-numeros .cc-sem .cc-num { color: $cc-sem; }
+.cc-numeros .cc-rotulo b { font-weight: 600; color: $cc-tinta; }
+.cc-numeros .cc-sem .cc-rotulo b { color: $cc-sem; }
+@media (max-width: 576px) {
+  .cc-numeros { grid-template-columns: repeat(2, 1fr); }
+  .cc-numeros > div:nth-child(3) { border-left: 0; }
+  .cc-numeros > div:nth-child(n+3) { border-top: 1px solid $cc-regua; }
+}
+
+.cc-secao { margin: 3.5rem 0 1rem; }
+.cc-chapeu { font-family: $font-family-sans-serif; font-size: .78rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: .12em; color: $cc-mata; margin-bottom: .35rem; }
+.cc-secao h2 { margin-top: 0; font-size: clamp(1.6rem, 3vw, 2.1rem); border: 0; }
+.cc-secao .cc-intro { color: $cc-apagado; max-width: 44rem; }
+
+.cc-legenda { display: flex; flex-wrap: wrap; gap: .4rem 1.2rem; font-family: $font-family-sans-serif;
+  font-size: .88rem; margin: .5rem 0 .75rem; }
+.cc-legenda span::before { content: ""; display: inline-block; width: .8em; height: .8em; border-radius: 2px;
+  margin-right: .4em; vertical-align: -.05em; background: var(--cor); }
+
+// Cartões dos grupos, com silhueta (PhyloPic) pintada pela cor do texto.
+.cc-grupos { display: grid; grid-template-columns: repeat(4, 1fr); gap: .9rem; }
+@media (max-width: 768px) { .cc-grupos { grid-template-columns: repeat(2, 1fr); } }
+.cc-grupo { background: $cc-cartao; border: 1px solid $cc-regua; border-radius: .75rem; padding: 1rem 1rem .9rem;
+  display: flex; flex-direction: column; gap: .35rem; transition: border-color .15s ease, transform .15s ease; }
+.cc-grupo:hover { border-color: $cc-mata; transform: translateY(-2px); }
+.cc-silhueta { width: 100%; height: 56px; background: $cc-tinta; opacity: .88;
+  mask-position: left bottom; mask-size: contain; mask-repeat: no-repeat;
+  -webkit-mask-position: left bottom; -webkit-mask-size: contain; -webkit-mask-repeat: no-repeat; }
+.cc-grupo h3 { font-size: 1.25rem; margin: .5rem 0 0; }
+.cc-grupo .cc-total { font-family: $font-family-sans-serif; font-size: .85rem; color: $cc-apagado; }
+.cc-barra { display: flex; height: 8px; border-radius: 999px; overflow: hidden; background: $cc-regua; margin: .3rem 0; }
+.cc-barra > i { display: block; height: 100%; }
+.cc-grupo .cc-linha { display: flex; justify-content: space-between; font-family: $font-family-sans-serif; font-size: .88rem; }
+.cc-grupo .cc-linha b { font-variant-numeric: tabular-nums; }
+.cc-grupo .cc-linha.cc-sem b { color: $cc-sem; }
+.cc-grupo .cc-linha.cc-brutos-linha { font-size: .8rem; color: $cc-brutos; }
+.cc-grupo .cc-linha.cc-brutos-linha b { color: $cc-brutos; }
+
+// Lista das espécies descritas há mais tempo e ainda sem DNA.
+.cc-antigas { list-style: none; padding: 0; margin: 0; columns: 2 18rem; column-gap: 2rem; }
+.cc-antigas li { break-inside: avoid; display: flex; gap: .75rem; align-items: baseline; padding: .45rem 0;
+  border-bottom: 1px dotted $cc-regua; }
+.cc-antigas .cc-ano { font-family: $headings-font-family; font-weight: 600; color: $cc-sem; min-width: 3rem;
+  font-variant-numeric: tabular-nums; }
+.cc-antigas .cc-quem { flex: 1; }
+.cc-antigas .cc-quem small { display: block; font-family: $font-family-sans-serif; color: $cc-apagado; font-size: .78rem; }
+
+// Faixa final: adote uma espécie.
+.cc-faixa { margin: 4rem 0 2rem; padding: 2.2rem 1.5rem; border-radius: 1rem; text-align: center;
+  background: $cc-cartao; border: 1px solid $cc-regua; }
+.cc-faixa h2 { margin: 0 0 .5rem; border: 0; }
+.cc-faixa p { max-width: 36rem; margin: 0 auto 1.2rem; color: $cc-apagado; }
+
+// ---------------------------------------------------------------------------
+// Páginas internas: cabeçalho, filtros e cartões de espécie
+// ---------------------------------------------------------------------------
+// Cabeçalho das páginas internas: centralizado, como a capa.
+.cc-cabeca { max-width: 52rem; margin: 2.5rem auto 2rem; text-align: center; }
+.cc-cabeca h1 { font-size: clamp(2rem, 4.5vw, 3rem); font-weight: 700; margin: 0 0 .6rem; }
+.cc-cabeca .cc-intro { display: block; max-width: 46rem; margin: 0 auto; color: $cc-apagado; font-size: 1.08rem; }
+
+// Quem faz
+.cc-autor { display: grid; grid-template-columns: 9.5rem 1fr; gap: 1.6rem; align-items: start;
+  background: $cc-cartao; border: 1px solid $cc-regua; border-radius: .9rem; padding: 1.5rem; margin: 0 0 2rem; }
+@media (max-width: 560px) { .cc-autor { grid-template-columns: 1fr; justify-items: center; text-align: center; } }
+.cc-autor img { width: 9.5rem; height: 9.5rem; border-radius: 999px; object-fit: cover; border: 3px solid $cc-papel;
+  box-shadow: 0 0 0 1px $cc-regua; }
+.cc-autor h2 { margin: 0 0 .15rem; border: 0; font-size: 1.6rem; }
+.cc-autor .cc-papel-autor { font-family: $font-family-sans-serif; font-size: .9rem; color: $cc-mata; margin: 0 0 .7rem; }
+.cc-autor p { margin: 0 0 .8rem; text-align: justify; hyphens: auto; }
+.cc-autor .cc-ctas { justify-content: flex-start; margin-top: .4rem; }
+@media (max-width: 560px) { .cc-autor .cc-ctas { justify-content: center; } }
+.cc-trajetoria { list-style: none; padding: 0; margin: .5rem 0 1.5rem; }
+.cc-trajetoria li { display: grid; grid-template-columns: 7.5rem 1fr; gap: 1rem; padding: .55rem 0;
+  border-bottom: 1px solid $cc-regua; }
+.cc-trajetoria li > span:first-child { font-family: $font-family-sans-serif; font-size: .85rem; color: $cc-apagado;
+  font-variant-numeric: tabular-nums; padding-top: .15rem; }
+#title-block-header .title { font-weight: 700; font-size: clamp(2rem, 4.5vw, 3rem); }
+#title-block-header .description { color: $cc-apagado; font-size: 1.1rem; }
+
+// Filtros em uma faixa; os controles do Observable Inputs viram "pílulas".
+.cc-filtros { display: flex; flex-wrap: wrap; gap: .9rem 1.6rem; align-items: flex-end;
+  padding: 1rem 1.2rem; margin-bottom: 1.2rem; background: $cc-cartao; border: 1px solid $cc-regua;
+  border-radius: .75rem; font-family: $font-family-sans-serif; font-size: .9rem; }
+.cc-filtros .cell, .cc-filtros .cell-output-display { margin: 0 !important; }
+.cc-filtros form { --label-width: auto; display: flex; flex-direction: column; gap: .3rem; margin: 0; width: auto; }
+.cc-filtros form > label { font-size: .72rem; font-weight: 600; text-transform: uppercase; letter-spacing: .08em;
+  color: $cc-apagado; margin: 0; }
+.cc-filtros form > div { display: flex; flex-wrap: wrap; gap: .35rem; }
+.cc-filtros form > div > label { display: inline-flex; align-items: center; gap: .3rem; margin: 0; padding: .2rem .7rem;
+  border: 1px solid $cc-regua; border-radius: 999px; cursor: pointer; background: $cc-papel; }
+.cc-filtros form > div > label:has(input:checked) { border-color: $cc-mata; background: rgba($cc-mata, .12); color: $cc-mata-link; }
+.cc-filtros form > div > label input { accent-color: $cc-mata; margin: 0; }
+.cc-filtros select, .cc-filtros input[type="text"] { padding: .3rem .6rem; border: 1px solid $cc-regua; border-radius: .4rem;
+  background: $cc-papel; color: $cc-tinta; min-width: 9rem; }
+
+.cc-resultado { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: .5rem;
+  font-family: $font-family-sans-serif; }
+.cc-resultado .cell, .cc-resultado .cell-output-display { margin: 0 !important; }
+.cc-contagem { margin: 0; font-size: .95rem; }
+.cc-resultado form > div { display: inline-flex; border: 1px solid $cc-regua; border-radius: 999px; overflow: hidden; }
+.cc-resultado form > div > label { margin: 0; padding: .25rem .9rem; cursor: pointer; font-size: .88rem; }
+.cc-resultado form > div > label input { display: none; }
+.cc-resultado form > div > label:has(input:checked) { background: $cc-mata; color: $cc-papel; }
+
+.cc-especies { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1.1rem; margin-top: 1rem; }
+.cc-especie { display: flex; flex-direction: column; background: $cc-cartao; border: 1px solid $cc-regua;
+  border-radius: .8rem; overflow: hidden; transition: border-color .15s ease, transform .15s ease, box-shadow .15s ease; }
+.cc-especie:hover { border-color: $cc-mata; transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0, 0, 0, .07); }
+.cc-foto { position: relative; margin: 0; aspect-ratio: 4 / 3; background: $cc-regua; overflow: hidden; }
+.cc-foto img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.cc-foto figcaption { position: absolute; left: 0; right: 0; bottom: 0; padding: 1.2rem .6rem .35rem;
+  font-size: .68rem; color: #f3efe4; background: linear-gradient(transparent, rgba(0, 0, 0, .6));
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cc-foto figcaption a { color: inherit; }
+.cc-sem-foto { display: flex; align-items: center; justify-content: center; background: rgba($cc-regua, .45); }
+.cc-sem-foto .cc-silhueta { width: 60%; height: 55%; opacity: .25; mask-position: center; -webkit-mask-position: center; }
+.cc-sem-foto figcaption { background: none; color: $cc-apagado; text-align: center; }
+.cc-corpo { padding: .85rem 1rem 1rem; display: flex; flex-direction: column; gap: .3rem; flex: 1; }
+.cc-topo { display: flex; flex-wrap: wrap; gap: .3rem; }
+.cc-especie h3 { font-family: $headings-font-family; font-size: 1.2rem; font-weight: 600; margin: .35rem 0 0; line-height: 1.2; }
+.cc-especie p { margin: 0; }
+.cc-autoria { font-size: .85rem; color: $cc-apagado; }
+.cc-onde { font-family: $font-family-sans-serif; font-size: .82rem; }
+.cc-bases { display: flex; gap: .9rem; font-family: $font-family-sans-serif; font-size: .82rem; }
+.cc-bases a { text-decoration: none; color: $cc-apagado; }
+.cc-bases a b { color: $cc-tinta; font-variant-numeric: tabular-nums; }
+.cc-obs { font-family: $font-family-sans-serif; font-size: .76rem; color: $cc-apagado; line-height: 1.4;
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.cc-acao { margin-top: auto; padding-top: .5rem; }
+.cc-chip { display: inline-block; padding: .05em .55em; border-radius: 999px; font-family: $font-family-sans-serif;
+  font-size: .75rem; font-weight: 600; border: 1px solid $cc-regua; color: $cc-apagado; }
+.cc-chip.cc-cr { background: #8c2d1c; border-color: #8c2d1c; color: #fff; }
+.cc-chip.cc-en { background: #c4633a; border-color: #c4633a; color: #fff; }
+.cc-chip.cc-vu { background: #d6a23a; border-color: #d6a23a; color: #1d2421; }
+.cc-chip.cc-dd { border-style: dashed; }
+.cc-chip.cc-adotada { background: rgba($cc-mata, .14); border-color: $cc-mata; color: $cc-mata-link; }
+.cc-chip.cc-brutos { background: rgba($cc-brutos, .12); border-color: rgba($cc-brutos, .7); color: $cc-brutos;
+  text-decoration: none; }
+.cc-chip.cc-brutos:hover { background: rgba($cc-brutos, .22); }
+.cc-cta.cc-pequeno { padding: .25rem .9rem; font-size: .85rem; }
+.cc-centro { text-align: center; margin: 1.5rem 0; }
+.cc-mais { background: transparent; cursor: pointer; }
+
+// Por estado: mapa e ranking lado a lado.
+.cc-mapa-tabela { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 2rem; align-items: start; }
+@media (max-width: 992px) { .cc-mapa-tabela { grid-template-columns: 1fr; } }
+.cc-ufs { list-style: none; padding: 0; margin: 0; font-family: $font-family-sans-serif; font-size: .88rem; }
+.cc-ufs li { display: grid; grid-template-columns: 9.5rem 1fr 3.5rem; grid-template-rows: auto auto; column-gap: .75rem;
+  align-items: center; padding: .4rem 0; border-bottom: 1px dotted $cc-regua; }
+.cc-uf-nome { font-weight: 500; }
+.cc-uf-barra { height: 8px; background: rgba($cc-regua, .5); border-radius: 999px; overflow: hidden; }
+.cc-uf-barra i { display: block; height: 100%; background: $cc-sem; border-radius: 999px; }
+.cc-uf-valor { text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; }
+.cc-uf-detalhe { grid-column: 1 / -1; font-size: .74rem; color: $cc-apagado; }
+
+// Mapa clicável e painel do estado escolhido.
+.cc-mapa g[aria-label="geo"]:first-of-type path { cursor: pointer; transition: opacity .15s; }
+.cc-mapa g[aria-label="geo"]:first-of-type path:hover { opacity: .78; }
+.cc-clicavel { cursor: pointer; border-radius: .4rem; }
+.cc-clicavel:hover, .cc-clicavel:focus-visible { background: rgba($cc-mata, .08); outline: none; }
+.cc-uf-painel { background: $cc-cartao; border: 1px solid $cc-regua; border-radius: .9rem; padding: 1.1rem 1.2rem; }
+.cc-uf-topo { display: flex; justify-content: space-between; align-items: center; gap: .8rem; }
+.cc-uf-topo .cc-chapeu { margin: 0; }
+.cc-uf-topo button.cc-cta { background: transparent; }
+.cc-uf-topo button.cc-cta:hover { background: rgba($cc-mata, .12); }
+.cc-uf-painel h3 { margin: .5rem 0 .3rem; font-size: 1.6rem; }
+.cc-uf-resumo { font-family: $font-family-sans-serif; font-size: .88rem; color: $cc-apagado; }
+.cc-uf-especies { list-style: none; padding: 0; margin: .6rem 0 .8rem; max-height: 34rem; overflow-y: auto;
+  border-top: 1px solid $cc-regua; }
+.cc-uf-especies li { display: flex; flex-wrap: wrap; align-items: baseline; gap: .15rem .5rem; padding: .5rem .2rem;
+  border-bottom: 1px solid $cc-regua; }
+.cc-uf-especies small { flex-basis: 100%; font-family: $font-family-sans-serif; font-size: .76rem; color: $cc-apagado; }
+.cc-uf-chips { display: inline-flex; gap: .3rem; }
+
+// Adote: passos numerados.
+.cc-passos { display: grid; grid-template-columns: repeat(2, 1fr); gap: .9rem; counter-reset: passo;
+  margin: 1rem 0 1.5rem; }
+@media (max-width: 560px) { .cc-passos { grid-template-columns: 1fr; } }
+.cc-passo { counter-increment: passo; background: $cc-cartao; border: 1px solid $cc-regua; border-radius: .75rem;
+  padding: 1rem 1.1rem; }
+.cc-passo h3 { font-size: 1.1rem; margin: 0 0 .4rem; }
+.cc-passo h3::before { content: counter(passo); display: inline-flex; align-items: center; justify-content: center;
+  width: 1.7rem; height: 1.7rem; margin-right: .5rem; border-radius: 999px; background: $cc-mata; color: $cc-papel;
+  font-family: $font-family-sans-serif; font-size: .85rem; vertical-align: .1em; }
+.cc-passo p { margin: 0; font-size: .95rem; color: $cc-apagado; }
+
+// Tabelas do texto (Fontes e método, Adote) e legenda do mapa sem fundo branco.
+main table:not(.table) { width: 100%; border-collapse: collapse; margin: 1rem 0 1.5rem; font-family: $font-family-sans-serif;
+  font-size: .88rem; }
+main table:not(.table) th { font-weight: 600; text-align: left; border-bottom: 2px solid $cc-tinta; padding: .45rem .6rem; }
+main table:not(.table) td { vertical-align: top; border-bottom: 1px solid $cc-regua; padding: .55rem .6rem; }
+.cc-mapa svg { background: transparent !important; }

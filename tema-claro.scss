@@ -1,0 +1,28 @@
+/*-- scss:defaults --*/
+// Tema "caderno de campo": papel, tinta quase preta e um verde-mata de destaque.
+// As cores de situação são compartilhadas com os gráficos (ver _comum.qmd).
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Inter:wght@400;500;600&display=swap');
+
+$cc-tinta: #1d2421;
+$cc-papel: #f7f4ec;
+$cc-cartao: #fffdf7;
+$cc-regua: #ddd4bf;
+$cc-apagado: #5f665f;
+$cc-mata: #2f6b4f;
+$cc-mata-link: #24553e;
+$cc-com: #8fae8f;
+$cc-verificar: #d6a23a;
+$cc-sem: #b8532c;
+$cc-brutos: #4f6f8f;
+$cc-escala: "light";
+
+$body-bg: $cc-papel;
+$body-color: $cc-tinta;
+$primary: $cc-mata;
+$link-color: $cc-mata-link;
+$border-color: $cc-regua;
+$navbar-bg: $cc-tinta;
+$navbar-fg: #e9e3d3;
+$navbar-hl: #ffffff;
+$footer-bg: $cc-papel;
+$footer-fg: $cc-apagado;

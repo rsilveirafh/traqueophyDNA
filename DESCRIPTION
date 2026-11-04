@@ -1,0 +1,18 @@
+Type: project
+Package: painel
+Title: Coleta de dados do painel de lacunas de DNA das plantas vasculares do Brasil
+Version: 0.1.0
+Description: Dependencias R dos scripts em R/ e scripts/ (usado pelo GitHub Actions
+    para instalar e manter em cache os pacotes). Nao e um pacote instalavel.
+License: MIT
+Encoding: UTF-8
+Imports:
+    dplyr,
+    httr2,
+    jsonlite,
+    purrr,
+    readr,
+    readxl,
+    stringr,
+    tibble,
+    tidyr

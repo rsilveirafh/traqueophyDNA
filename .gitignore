@@ -1,0 +1,21 @@
+# Quarto
+/_site/
+/.quarto/
+*_files/
+/*.html
+
+# R
+.Rproj.user/
+.Rhistory
+.RData
+.Renviron
+
+# local
+CLAUDE.md
+.claude/
+*.log
+
+**/*.quarto_ipynb
+
+# planejamento local (roteiro com dados pessoais)
+.planning/

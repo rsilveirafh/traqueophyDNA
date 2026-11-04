@@ -1,0 +1,60 @@
+---
+pagetitle: "Quem faz · traqueophyDNA"
+description: "Quem mantém o traqueophyDNA, como entrar em contato e como citar."
+format: html
+---
+
+::: {.cc-cabeca}
+[Quem faz]{.cc-chapeu}
+
+# Um curioso contando o que falta sequenciar
+
+[O traqueophyDNA é um projeto pessoal, aberto e mantido por uma pessoa. Correções e sugestões são muito bem-vindas.]{.cc-intro}
+:::
+
+::: {.cc-autor}
+![](assets/autor.jpg){fig-alt="Foto de Ricardo Silveira"}
+
+::: {}
+## Ricardo Silveira
+
+[Ricardo Rodrigues da Silveira Filho · Natal, RN]{.cc-papel-autor}
+
+Biólogo, doutor em Zoologia, hoje trabalhando com dados e software. Durante uma década, fez perguntas a dados biológicos em herpetologia, mimetismo, filogenética e filogeografia, principalmente de serpentes, e também em conservação, biodiversidade, bioinformática e ecologia vegetal.
+
+No último trabalho, como Analista de Inovação na [Seteg](https://www.setegce.com/), consultoria ambiental, construiu sistemas usados pela empresa inteira e por clientes: softwares de gestão interna, aplicativos de coleta de dados em campo, análise de dados e relatórios, painéis de Business Intelligence e uma plataforma de gestão ESG. Também liderou o time de inovação, com três desenvolvedores e um designer.
+
+::: {.cc-ctas}
+[<i class="bi bi-envelope"></i> E-mail](mailto:rsilveirafh@gmail.com){.cc-cta .cc-pequeno}
+[<i class="bi bi-mortarboard"></i> Lattes](http://lattes.cnpq.br/6028156427352678){.cc-cta .cc-pequeno}
+[<i class="bi bi-github"></i> GitHub](https://github.com/rsilveirafh){.cc-cta .cc-pequeno}
+[<i class="bi bi-linkedin"></i> LinkedIn](https://www.linkedin.com/in/rsilveirafh/){.cc-cta .cc-pequeno}
+[<i class="bi bi-globe"></i> Site pessoal](https://rsilveirafh.netlify.app/){.cc-cta .cc-pequeno}
+:::
+:::
+:::
+
+## Trajetória
+
+<ul class="cc-trajetoria">
+<li><span>2025–2026</span><span>Analista de Inovação, Seteg</span></li>
+<li><span>2024–2025</span><span>Analista Ambiental, Seteg</span></li>
+<li><span>2022–2023</span><span>Pós-doutorado na UFRN, junto ao PPBio: conservação, biodiversidade, bioinformática e genética</span></li>
+<li><span>2020–2024</span><span>Cientista de dados, Conciso TI</span></li>
+<li><span>2018–2019</span><span>Pós-doutorado na Universidade do Estado de Mato Grosso (UNEMAT): ecologia vegetal</span></li>
+<li><span>2013–2017</span><span>Doutorado em Zoologia, Universidade Federal da Paraíba (UFPB): filogeografia de <em>Philodryas nattereri</em></span></li>
+<li><span>2011–</span><span>Consultor ambiental e estatístico</span></li>
+<li><span>2010–2012</span><span>Mestrado em Zoologia, UFPB: mimetismo em serpentes corais</span></li>
+<li><span>2008–2009</span><span>Cadista, Barbosa & Barbosa</span></li>
+<li><span>2004–2009</span><span>Licenciatura em Ciências Biológicas, Universidade Estadual de Feira de Santana (UEFS)</span></li>
+</ul>
+
+## Contato
+
+Escreva para [rsilveirafh@gmail.com](mailto:rsilveirafh@gmail.com). Achou uma espécie com situação errada, um sinônimo que faltou ou um nome desatualizado? [Abra uma correção no GitHub](https://github.com/rsilveirafh/traqueophyDNA/issues/new?labels=correcao). Para adotar uma espécie, veja [Adote uma espécie](adote.qmd).
+
+## Como citar
+
+> da Silveira-Filho, R. R. (2026). *traqueophyDNA: a lacuna de DNA das plantas vasculares do Brasil*. <https://rsilveirafh.github.io/traqueophyDNA/>
+
+Os dados (`data/cobertura.csv`) são CC-BY 4.0 e o código é MIT. Cite também as listas de espécies e as bases de sequências usadas, listadas em [Fontes e método](sobre.qmd).

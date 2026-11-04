@@ -1,0 +1,72 @@
+# Configuração do site. O NOME DO PROJETO fica só aqui (title, site-url,
+# repo-url): para renomear, troque estas linhas e o nome do repositório.
+project:
+  type: website
+  output-dir: _site
+  render:
+    - index.qmd
+    - especies.qmd
+    - estados.qmd
+    - adote.qmd
+    - sobre.qmd
+    - autor.qmd
+  resources:
+    - data/cobertura.csv
+    - data/historico.csv
+    - data/eventos.csv
+    - data/adocoes.csv
+    - data/status.json
+    - data/fotos.csv
+    - data-raw/uf_ibge.geojson
+    - assets/**
+
+website:
+  title: "traqueophyDNA"
+  favicon: assets/favicon.svg
+  description: "Quantas espécies de plantas vasculares nativas do Brasil (angiospermas, gimnospermas, samambaias e licófitas) ainda não têm nenhuma sequência de DNA pública no BOLD ou no GenBank? Atualizado toda semana."
+  site-url: "https://rsilveirafh.github.io/traqueophyDNA/"
+  repo-url: "https://github.com/rsilveirafh/traqueophyDNA"
+  repo-actions: [issue, source]
+  open-graph: true
+  twitter-card: true
+  navbar:
+    logo: assets/logo.svg
+    logo-alt: "traqueophyDNA"
+    left:
+      - href: index.qmd
+        text: Visão geral
+      - href: especies.qmd
+        text: Espécies sem DNA
+      - href: estados.qmd
+        text: Por estado
+      - href: adote.qmd
+        text: Adote uma espécie
+      - href: sobre.qmd
+        text: Fontes e método
+      - href: autor.qmd
+        text: Quem faz
+    right:
+      - icon: github
+        href: "https://github.com/rsilveirafh/traqueophyDNA"
+        aria-label: Código no GitHub
+  page-footer:
+    left: "Dados: BOLD Systems, NCBI GenBank e Flora e Funga do Brasil (JBRJ) (ver Fontes)."
+    right: "Código MIT · Dados CC-BY 4.0"
+
+lang: pt-BR
+
+format:
+  html:
+    theme:
+      light: [tema-claro.scss, estilo.scss]
+      dark: [tema-escuro.scss, estilo.scss]
+    toc: false
+  dashboard:
+    theme:
+      light: [tema-claro.scss, estilo.scss]
+      dark: [tema-escuro.scss, estilo.scss]
+
+execute:
+  echo: false
+  warning: false
+  message: false

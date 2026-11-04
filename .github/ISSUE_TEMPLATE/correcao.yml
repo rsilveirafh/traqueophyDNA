@@ -1,0 +1,29 @@
+name: Corrigir uma espécie (achei DNA / nome errado)
+description: A espécie aparece sem DNA, mas há sequência sob outro nome; ou o nome, a UF ou o grupo estão errados.
+title: "Correção: "
+labels: ["correcao"]
+body:
+  - type: input
+    id: especie
+    attributes:
+      label: Espécie (como aparece no painel)
+    validations:
+      required: true
+  - type: dropdown
+    id: tipo
+    attributes:
+      label: O que está errado?
+      options:
+        - Há sequência pública sob outro nome (sinônimo, grafia, identificação antiga)
+        - O nome válido mudou
+        - Ocorrência por UF errada
+        - Outro
+    validations:
+      required: true
+  - type: textarea
+    id: evidencia
+    attributes:
+      label: Evidência
+      description: Links para o registro no BOLD/GenBank (accession), artigo ou base taxonômica.
+    validations:
+      required: true
