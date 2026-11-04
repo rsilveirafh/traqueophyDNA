@@ -1,14 +1,15 @@
 #!/usr/bin/env Rscript
-# Pipeline completo: listas -> CTFB -> BOLD -> GenBank -> SRA -> cobertura -> fotos.
+# Pipeline completo: lista (Flora e Funga) -> ameaça (MMA) -> BOLD -> GenBank ->
+# SRA -> cobertura -> fotos.
 #
 # Uso (a partir da raiz do repositório):
 #   Rscript scripts/atualiza.R
-#   Rscript scripts/atualiza.R --max-genbank=500 --max-minutos=60
-#   Rscript scripts/atualiza.R --grupos-genbank=anfibios,repteis --sem-baixar
+#   Rscript scripts/atualiza.R --so-lista            # só data/especies.csv (F1)
+#   Rscript scripts/atualiza.R --max-genbank=500 --max-minutos=60 --sem-baixar
 #
 # Variáveis de ambiente: NCBI_API_KEY (opcional, 10 req/s), NCBI_EMAIL (opcional).
 
-for (f in c("utils", "listas", "ameaca", "ctfb", "gbif", "bold", "genbank", "sra", "junta", "fotos")) {
+for (f in c("utils", "listas", "ameaca", "gbif", "bold", "genbank", "sra", "junta", "fotos")) {
   source(file.path("R", paste0(f, ".R")), encoding = "UTF-8")
 }
 
@@ -21,25 +22,24 @@ arg <- function(nome, padrao = NULL) {
 }
 max_genbank <- as.numeric(arg("max-genbank", Inf))
 max_minutos <- as.numeric(arg("max-minutos", Inf))
+so_lista <- isTRUE(arg("so-lista", FALSE))
 grupos_gb <- arg("grupos-genbank", paste(GRUPOS$grupo, collapse = ","))
 grupos_gb <- strsplit(grupos_gb, ",")[[1]]
 baixar <- !isTRUE(arg("sem-baixar", FALSE))
 
 avisos <- character()
 
-# 1. Listas (todas, sempre: é barato) ------------------------------------------
-especies <- monta_listas(GRUPOS$grupo, baixar = baixar) |> aplica_ameaca_mma2026()
+# 1. Lista e ameaça (sempre: é barato) --------------------------------------------
+especies <- monta_listas(baixar = baixar) |> aplica_ameaca(baixar = baixar)
+especies$sinonimos <- especies$sinonimos_lista   # WCVP soma aqui na F2
+gravar_csv(select(especies, -sinonimos), "data/especies.csv")
+msg("Espécies: ", nrow(especies))
+print(count(especies, grupo))
+if (so_lista) quit(save = "no")
 
-# 2. CTFB: sinônimos, UF, endemismo, ano ----------------------------------------
-ctfb <- tryCatch(atualiza_ctfb(GRUPOS$classe), error = function(e) {
-  avisos <<- c(avisos, paste("CTFB indisponível:", conditionMessage(e))); NULL
-})
-if (!is.null(ctfb)) {
-  especies <- enriquece_ctfb(especies, ctfb)
-} else {
-  especies <- mutate(especies, ctfb_situacao = "ausente", id_ctfb = NA_character_,
-                     nome_aceito_ctfb = NA_character_, sinonimos = sinonimos_lista)
-}
+# F2 (DNA) ainda não adaptada para plantas: o que segue é o pipeline do
+# tetrapoDNA (pré-filtro pelo taxdump do NCBI e sinônimos do WCVP entram aqui).
+stop("F2 ainda não adaptada para plantas; use --so-lista")
 
 # 3. BOLD ------------------------------------------------------------------------
 bold <- atualiza_bold(GRUPOS$classe)

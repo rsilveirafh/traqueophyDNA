@@ -19,3 +19,6 @@ CLAUDE.md
 
 # planejamento local (roteiro com dados pessoais)
 .planning/
+
+# fonte grande (20 MB), baixada a cada execução
+data-raw/flora_fungabr_dwca.zip
