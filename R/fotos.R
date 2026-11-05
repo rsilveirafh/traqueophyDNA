@@ -45,7 +45,7 @@ inat_ids <- function(nomes, destino = "data/cache/inat_ids.csv", dias_validade =
 
 inat_fotos_lote <- function(ids) {
   j <- req_base(paste0(INAT_API, "/taxa/", paste(ids, collapse = ","))) |>
-    req_throttle(rate = 1, realm = "inaturalist") |>
+    req_throttle(rate = 0.75, realm = "inaturalist") |>   # a 1/s o iNat recusa parte (429)
     req_perform() |>
     resp_body_json()
   map(j$results, function(t) {
