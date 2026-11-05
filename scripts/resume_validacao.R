@@ -38,29 +38,39 @@ for (i in seq_len(nrow(res))) with(res[i, ], cat(sprintf("  %-12s -> %-12s %2d/%
 cat("\nMotivos:\n"); print(count(x, motivo, sort = TRUE))
 
 # Auditoria humana: 20 espécies, por estrato, com peso maior nos casos que mudam o resultado.
-set.seed(20261031)
+# Em plantas, as decisões que pedem olho de botânico são as das "a verificar"
+# (sinônimo de outra espécie aceita, homônimo, conceito amplo do WCVP).
+set.seed(20261105)
+x <- x |> mutate(estrato = case_when(
+  situacao_painel == "a verificar" & situacao_correta == "sem DNA" &
+    motivo %in% c("sequências de outra espécie aceita na Flora e Funga") ~ "av_outra_especie",
+  situacao_painel == "a verificar" & situacao_correta == "sem DNA" &
+    motivo %in% c("homônimo", "conceito amplo, material de fora") ~ "av_homonimo_conceito",
+  situacao_painel == "a verificar" ~ paste0("av_", situacao_correta),
+  TRUE ~ situacao_painel
+))
 COTAS <- tribble(
-  ~situacao_painel, ~situacao_correta, ~k,
-  "sem DNA",     "só SRA",      4,
-  "sem DNA",     "sem DNA",     5,
-  "a verificar", "com DNA",     3,
-  "a verificar", "só SRA",      2,
-  "a verificar", "a verificar", 1,
-  "a verificar", "sem DNA",     3,
-  "com DNA",     "com DNA",     2
+  ~estrato,               ~k,
+  "av_com DNA",            4,
+  "av_outra_especie",      3,
+  "av_homonimo_conceito",  3,
+  "av_a verificar",        2,
+  "av_sem DNA",            2,
+  "sem DNA",               4,
+  "com DNA",               2
 )
-aud <- purrr::pmap(COTAS, function(situacao_painel, situacao_correta, k) {
-  d <- x[x$situacao_painel == situacao_painel & x$situacao_correta == situacao_correta, ]
+aud <- purrr::pmap(COTAS, function(estrato, k) {
+  d <- x[x$estrato == estrato, ]
   slice_sample(d, n = min(k, nrow(d)))
 }) |> bind_rows() |> arrange(id)
 gravar_csv(aud, "validacao/auditoria.csv")
 msg("Auditoria: ", nrow(aud), " espécies em validacao/auditoria.csv")
 
 # Planilha da auditoria: o julgamento da checagem assistida, os links e duas colunas a preencher.
-links <- select(amostra, id, bold, genbank_organism, genbank_todos, taxonomia_ncbi)
+links <- select(amostra, id, bold, genbank_organism, genbank_todos, taxonomia_ncbi, flora_funga, powo)
 planilha <- aud |>
   select(id, grupo, especie, situacao_painel) |>
-  left_join(select(julg, id, situacao_correta, base, nome_no_banco, n_sequencias, acesso_exemplo, comentario), by = "id") |>
+  left_join(select(julg, id, situacao_correta, motivo, base, nome_no_banco, n_sequencias, acesso_exemplo, comentario), by = "id") |>
   left_join(links, by = "id") |>
   mutate(sra = paste0("https://www.ncbi.nlm.nih.gov/sra/?term=", utils::URLencode(paste0('"', especie, '"[Organism]'), reserved = TRUE)),
          concorda = NA_character_, situacao_auditor = NA_character_, comentario_auditor = NA_character_,
@@ -68,7 +78,7 @@ planilha <- aud |>
 wb <- openxlsx::createWorkbook()
 openxlsx::addWorksheet(wb, "auditoria")
 openxlsx::writeData(wb, "auditoria", planilha)
-for (col in c("bold", "genbank_organism", "genbank_todos", "taxonomia_ncbi", "sra")) {
+for (col in c("bold", "genbank_organism", "genbank_todos", "taxonomia_ncbi", "flora_funga", "powo", "sra")) {
   v <- planilha[[col]]; class(v) <- "hyperlink"
   openxlsx::writeData(wb, "auditoria", x = v, startCol = match(col, names(planilha)), startRow = 2, colNames = FALSE)
 }
@@ -76,7 +86,7 @@ n <- nrow(planilha)
 openxlsx::dataValidation(wb, "auditoria", cols = match("concorda", names(planilha)), rows = 2:(n + 1),
                          type = "list", value = '"sim,não,em parte"')
 openxlsx::dataValidation(wb, "auditoria", cols = match("situacao_auditor", names(planilha)), rows = 2:(n + 1),
-                         type = "list", value = '"com DNA,só SRA,sem DNA,a verificar"')
+                         type = "list", value = '"com DNA,sem DNA,a verificar"')
 openxlsx::addStyle(wb, "auditoria", openxlsx::createStyle(fgFill = "#fff3d6"), rows = 1:(n + 1),
                    cols = match("concorda", names(planilha)):ncol(planilha), gridExpand = TRUE, stack = TRUE)
 openxlsx::addStyle(wb, "auditoria", openxlsx::createStyle(textDecoration = "bold"), rows = 1,

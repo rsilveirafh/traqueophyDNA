@@ -10,10 +10,23 @@
 
 source("R/utils.R", encoding = "UTF-8")
 
-SEMENTE <- 20261030
+SEMENTE <- 20261105
 TAMANHO <- c("sem DNA" = 50, "a verificar" = 50, "com DNA" = 20)
 
 cob <- ler_csv("data/cobertura.csv", col_types = cols(.default = col_character()))
+# Nomes buscados: os da Flora e Funga (data/especies.csv) e os do WCVP (data/wcvp.csv);
+# o data/cobertura.csv não guarda os sinônimos (pesaria no site).
+junta_nomes <- function(a, b) {
+  x <- unique(c(if (!is.na(a)) strsplit(a, ";")[[1]], if (!is.na(b)) strsplit(b, ";")[[1]]))
+  if (length(x)) paste(sort(x), collapse = ";") else NA_character_
+}
+sin <- ler_csv("data/especies.csv", col_types = cols(.default = col_character())) |>
+  select(especie, sinonimos_lista) |>
+  left_join(select(ler_csv("data/wcvp.csv", col_types = cols(.default = col_character())),
+                   especie, sinonimos_wcvp), by = "especie") |>
+  mutate(sinonimos = purrr::map2_chr(sinonimos_lista, sinonimos_wcvp, junta_nomes)) |>
+  select(especie, sinonimos)
+cob <- left_join(cob, sin, by = "especie")
 versao <- unique(cob$atualizado_em)
 
 # Quantas de cada grupo em cada situação: proporcional, arredondando pelo maior resto.
@@ -49,7 +62,8 @@ saida <- amostra |>
     genbank_organism = url("https://www.ncbi.nlm.nih.gov/nuccore/?term=", paste0('"', especie, '"[Organism]')),
     genbank_todos = url("https://www.ncbi.nlm.nih.gov/nuccore/?term=", paste0('"', especie, '"')),
     taxonomia_ncbi = url("https://www.ncbi.nlm.nih.gov/taxonomy/?term=", especie),
-    gbif = url("https://www.gbif.org/species/search?q=", especie),
+    flora_funga = paste0("https://floradobrasil.jbrj.gov.br/FB", id_ffb),
+    powo = url("https://powo.science.kew.org/results?q=", especie),
     peso,
     # A preencher (ver PROTOCOLO.md)
     dna_publico = NA_character_, base = NA_character_, nome_no_banco = NA_character_,
@@ -65,7 +79,7 @@ gravar_csv(select(saida, id:peso), "validacao/amostra.csv")
 wb <- openxlsx::createWorkbook()
 openxlsx::addWorksheet(wb, "conferencia")
 openxlsx::writeData(wb, "conferencia", saida)
-for (col in c("bold", "genbank_organism", "genbank_todos", "taxonomia_ncbi", "gbif")) {
+for (col in c("bold", "genbank_organism", "genbank_todos", "taxonomia_ncbi", "flora_funga", "powo")) {
   j <- match(col, names(saida))
   v <- saida[[col]]
   class(v) <- "hyperlink"

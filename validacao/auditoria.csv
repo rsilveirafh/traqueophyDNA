@@ -1,0 +1,21 @@
+id,grupo,especie,situacao_painel,situacao_correta,motivo,estrato
+V007,angiospermas,Calea harleyi,sem DNA,sem DNA,confere,sem DNA
+V018,angiospermas,Heisteria pentandra,sem DNA,sem DNA,confere,sem DNA
+V026,angiospermas,Maranta phrynioides,sem DNA,sem DNA,confere,sem DNA
+V029,angiospermas,Ocotea camphoromoea,sem DNA,sem DNA,confere,sem DNA
+V057,angiospermas,Chamaecrista amphibola,a verificar,sem DNA,sequências de outra espécie aceita na Flora e Funga,av_outra_especie
+V058,angiospermas,Cleistes grandiflora,a verificar,com DNA,sinônimo heterotípico,av_com DNA
+V063,angiospermas,Dimerostemma grisebachii,a verificar,sem DNA,homônimo,av_homonimo_conceito
+V068,angiospermas,Ferdinandusa elliptica,a verificar,com DNA,sinônimo heterotípico,av_com DNA
+V072,angiospermas,Hibiscus multiformis,a verificar,sem DNA,"conceito amplo, material de fora",av_homonimo_conceito
+V073,angiospermas,Hydrocotyle asterias,a verificar,a verificar,"conceito amplo, material de fora",av_a verificar
+V082,angiospermas,Myrcia rufopilosa,a verificar,sem DNA,sequências de outra espécie aceita na Flora e Funga,av_outra_especie
+V084,angiospermas,Pilocarpus sulcatus,a verificar,sem DNA,confere,av_sem DNA
+V085,angiospermas,Piper naiadense,a verificar,sem DNA,confere,av_sem DNA
+V086,angiospermas,Pleiochiton setulosum,a verificar,com DNA,nome novo ou transferência,av_com DNA
+V090,angiospermas,Senegalia tubulifera,a verificar,sem DNA,sequências de outra espécie aceita na Flora e Funga,av_outra_especie
+V093,angiospermas,Syngonium vellozianum,a verificar,sem DNA,"conceito amplo, material de fora",av_homonimo_conceito
+V096,angiospermas,Varronia polystachya,a verificar,a verificar,"conceito amplo, material de fora",av_a verificar
+V098,samambaias,Megalastrum eugenii,a verificar,com DNA,táxon novo no NCBI,av_com DNA
+V112,angiospermas,Microlicia chrysoglandulosa,com DNA,com DNA,confere,com DNA
+V117,angiospermas,Piper arboreum,com DNA,com DNA,confere,com DNA

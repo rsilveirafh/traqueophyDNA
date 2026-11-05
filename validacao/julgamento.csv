@@ -1,0 +1,121 @@
+id,especie,situacao_painel,dna_publico,base,nome_no_banco,n_sequencias,acesso_exemplo,situacao_correta,motivo,comentario,conferido_por,data_conferencia
+V001,Actinocephalus velutinus,sem DNA,não,nenhuma,,,,sem DNA,confere,"nada no NCBI (taxonomia, nuccore, SRA, BioSample) nem no BOLD, inclusive no gênero",Claude (checagem assistida),2026-11-05
+V002,Aegiphila haughtii,sem DNA,não,nenhuma,,,,sem DNA,confere,"nada no NCBI (taxonomia, nuccore, SRA, BioSample) nem no BOLD, inclusive no gênero",Claude (checagem assistida),2026-11-05
+V003,Aspidosperma macrocarpon,sem DNA,não,nenhuma,,,,sem DNA,confere,"nada no NCBI (taxonomia, nuccore, SRA, BioSample) nem no BOLD, inclusive no gênero",Claude (checagem assistida),2026-11-05
+V004,Asplundia divergens,sem DNA,não,nenhuma,,,,sem DNA,confere,"nada no NCBI (taxonomia, nuccore, SRA, BioSample) nem no BOLD, inclusive no gênero",Claude (checagem assistida),2026-11-05
+V005,Axonopus graniticola,sem DNA,não,nenhuma,,,,sem DNA,confere,epíteto só em Festuca graniticola (outra espécie),Claude (checagem assistida),2026-11-05
+V006,Bixa atlantica,sem DNA,não,nenhuma,,,,sem DNA,confere,"nada no NCBI (taxonomia, nuccore, SRA, BioSample) nem no BOLD, inclusive no gênero",Claude (checagem assistida),2026-11-05
+V007,Calea harleyi,sem DNA,não,nenhuma,,,,sem DNA,confere,epíteto só em Cyrtocymura harleyi (outra espécie aceita na Flora e Funga),Claude (checagem assistida),2026-11-05
+V008,Celtis atlantica,sem DNA,não,nenhuma,,,,sem DNA,confere,"nada no NCBI (taxonomia, nuccore, SRA, BioSample) nem no BOLD, inclusive no gênero",Claude (checagem assistida),2026-11-05
+V009,Cnidoscolus conicus,sem DNA,não,nenhuma,,,,sem DNA,confere,"nada no NCBI (taxonomia, nuccore, SRA, BioSample) nem no BOLD, inclusive no gênero",Claude (checagem assistida),2026-11-05
+V010,Coryanthes marcaliana,sem DNA,não,nenhuma,,,,sem DNA,confere,"nada no NCBI (taxonomia, nuccore, SRA, BioSample) nem no BOLD, inclusive no gênero",Claude (checagem assistida),2026-11-05
+V011,Croton calocephalus,sem DNA,não,nenhuma,,,,sem DNA,confere,"nada no NCBI (taxonomia, nuccore, SRA, BioSample) nem no BOLD, inclusive no gênero",Claude (checagem assistida),2026-11-05
+V012,Dracontium asperum,sem DNA,só SRA,SRA,Dracontium asperum,1,,sem DNA,só SRA,"1 SRA e 1 BioSample, nada montado; o painel já marca dados brutos",Claude (checagem assistida),2026-11-05
+V013,Dyckia myriostachya,sem DNA,não,nenhuma,,,,sem DNA,confere,"nada no NCBI (taxonomia, nuccore, SRA, BioSample) nem no BOLD, inclusive no gênero",Claude (checagem assistida),2026-11-05
+V014,Epidendrum caldense,sem DNA,não,nenhuma,,,,sem DNA,confere,"nada no NCBI (taxonomia, nuccore, SRA, BioSample) nem no BOLD, inclusive no gênero",Claude (checagem assistida),2026-11-05
+V015,Erythroxylum timothei,sem DNA,não,nenhuma,,,,sem DNA,confere,"nada no NCBI (taxonomia, nuccore, SRA, BioSample) nem no BOLD, inclusive no gênero",Claude (checagem assistida),2026-11-05
+V016,Glicophyllum pohlianum,sem DNA,não,nenhuma,,,,sem DNA,confere,"nada no NCBI (taxonomia, nuccore, SRA, BioSample) nem no BOLD, inclusive no gênero",Claude (checagem assistida),2026-11-05
+V017,Hapalorchis cymbirostris,sem DNA,não,nenhuma,,,,sem DNA,confere,"nada no NCBI (taxonomia, nuccore, SRA, BioSample) nem no BOLD, inclusive no gênero",Claude (checagem assistida),2026-11-05
+V018,Heisteria pentandra,sem DNA,não,nenhuma,,,,sem DNA,confere,"nada no NCBI (taxonomia, nuccore, SRA, BioSample) nem no BOLD, inclusive no gênero",Claude (checagem assistida),2026-11-05
+V019,Heteropsis peruviana,sem DNA,não,nenhuma,,,,sem DNA,confere,"nada no NCBI (taxonomia, nuccore, SRA, BioSample) nem no BOLD, inclusive no gênero",Claude (checagem assistida),2026-11-05
+V020,Hohenbergia arcuata,sem DNA,não,nenhuma,,,,sem DNA,confere,"nada no NCBI (taxonomia, nuccore, SRA, BioSample) nem no BOLD, inclusive no gênero",Claude (checagem assistida),2026-11-05
+V021,Hysterionica nebularis,sem DNA,não,nenhuma,,,,sem DNA,confere,táxon no NCBI com 1 BioSample e nenhuma sequência; epíteto em Baccharis nebularis (outra espécie aceita),Claude (checagem assistida),2026-11-05
+V022,Linum smithii,sem DNA,não,nenhuma,,,,sem DNA,confere,"nada no NCBI (taxonomia, nuccore, SRA, BioSample) nem no BOLD, inclusive no gênero",Claude (checagem assistida),2026-11-05
+V023,Lychnophora grisea,sem DNA,não,nenhuma,,,,sem DNA,confere,epíteto só em Amphiglossa grisea (outra espécie),Claude (checagem assistida),2026-11-05
+V024,Manettia irwinii,sem DNA,não,nenhuma,,,,sem DNA,confere,epíteto só em Faramea e Hindsia irwinii (outras espécies),Claude (checagem assistida),2026-11-05
+V025,Manihot australis,sem DNA,só SRA,SRA,Manihot australis,2,,sem DNA,só SRA,"2 SRA, nada montado; o painel já marca dados brutos",Claude (checagem assistida),2026-11-05
+V026,Maranta phrynioides,sem DNA,não,nenhuma,,,,sem DNA,confere,"nada no NCBI (taxonomia, nuccore, SRA, BioSample) nem no BOLD, inclusive no gênero",Claude (checagem assistida),2026-11-05
+V027,Microlicia bahiensis,sem DNA,não,nenhuma,,,,sem DNA,confere,epíteto só em Marcetia bahiensis (outra espécie aceita na Flora e Funga e no WCVP),Claude (checagem assistida),2026-11-05
+V028,Nidularium espiritosantense,sem DNA,não,nenhuma,,,,sem DNA,confere,"nada no NCBI (taxonomia, nuccore, SRA, BioSample) nem no BOLD, inclusive no gênero",Claude (checagem assistida),2026-11-05
+V029,Ocotea camphoromoea,sem DNA,não,nenhuma,,,,sem DNA,confere,"nada no NCBI (taxonomia, nuccore, SRA, BioSample) nem no BOLD, inclusive no gênero",Claude (checagem assistida),2026-11-05
+V030,Ocotea pumila,sem DNA,não,nenhuma,,,,sem DNA,confere,"nada no NCBI (taxonomia, nuccore, SRA, BioSample) nem no BOLD, inclusive no gênero",Claude (checagem assistida),2026-11-05
+V031,Palicourea heteroneura,sem DNA,não,nenhuma,,,,sem DNA,confere,epíteto só em metagenomas,Claude (checagem assistida),2026-11-05
+V032,Palicourea lachnantha,sem DNA,não,nenhuma,,,,sem DNA,confere,"nada no NCBI (taxonomia, nuccore, SRA, BioSample) nem no BOLD, inclusive no gênero",Claude (checagem assistida),2026-11-05
+V033,Palicourea regina,sem DNA,não,nenhuma,,,,sem DNA,confere,epíteto só em outras Rubiaceae,Claude (checagem assistida),2026-11-05
+V034,Palicourea turbinella,sem DNA,não,nenhuma,,,,sem DNA,confere,"nada no NCBI (taxonomia, nuccore, SRA, BioSample) nem no BOLD, inclusive no gênero",Claude (checagem assistida),2026-11-05
+V035,Peltaea heringeri,sem DNA,não,nenhuma,,,,sem DNA,confere,epíteto só em Phragmocarpidium heringeri (outra espécie aceita),Claude (checagem assistida),2026-11-05
+V036,Pfaffia brunae,sem DNA,não,nenhuma,,,,sem DNA,confere,"nada no NCBI (taxonomia, nuccore, SRA, BioSample) nem no BOLD, inclusive no gênero",Claude (checagem assistida),2026-11-05
+V037,Philodendron kautskyi,sem DNA,não,nenhuma,,,,sem DNA,confere,"nada no NCBI (taxonomia, nuccore, SRA, BioSample) nem no BOLD, inclusive no gênero",Claude (checagem assistida),2026-11-05
+V038,Piptocarpha pyrifolia,sem DNA,não,nenhuma,,,,sem DNA,confere,epíteto só em outras Asteraceae (Microglossa pyrifolia etc.),Claude (checagem assistida),2026-11-05
+V039,Rapatea muaju,sem DNA,não,nenhuma,,,,sem DNA,confere,"nada no NCBI (taxonomia, nuccore, SRA, BioSample) nem no BOLD, inclusive no gênero",Claude (checagem assistida),2026-11-05
+V040,Renealmia pycnostachys,sem DNA,não,nenhuma,,,,sem DNA,confere,epíteto só em Globba pycnostachys,Claude (checagem assistida),2026-11-05
+V041,Rodriguezia candida,sem DNA,não,nenhuma,,,,sem DNA,confere,epíteto só em outras orquídeas (Stanhopea e Miltonia candida),Claude (checagem assistida),2026-11-05
+V042,Sebastiania macrocarpa,sem DNA,não,nenhuma,,,,sem DNA,confere,epíteto só em Euphorbia macrocarpa,Claude (checagem assistida),2026-11-05
+V043,Solanum setosissimum,sem DNA,não,nenhuma,,,,sem DNA,confere,"nada no NCBI (taxonomia, nuccore, SRA, BioSample) nem no BOLD, inclusive no gênero",Claude (checagem assistida),2026-11-05
+V044,Stenandrium pohlii,sem DNA,não,nenhuma,,,,sem DNA,confere,"nada no NCBI (taxonomia, nuccore, SRA, BioSample) nem no BOLD, inclusive no gênero",Claude (checagem assistida),2026-11-05
+V045,Syagrus allagopteroides,sem DNA,só SRA,SRA,Syagrus allagopteroides,1,,sem DNA,só SRA,"1 SRA, nada montado; o painel já marca dados brutos",Claude (checagem assistida),2026-11-05
+V046,Thyrsodium bolivianum,sem DNA,não,nenhuma,,,,sem DNA,confere,"nada no NCBI (taxonomia, nuccore, SRA, BioSample) nem no BOLD, inclusive no gênero",Claude (checagem assistida),2026-11-05
+V047,Tradescantia tenella,sem DNA,não,nenhuma,,,,sem DNA,confere,"nada no NCBI (taxonomia, nuccore, SRA, BioSample) nem no BOLD, inclusive no gênero",Claude (checagem assistida),2026-11-05
+V048,Xylosma tessmannii,sem DNA,não,nenhuma,,,,sem DNA,confere,"nada no NCBI (taxonomia, nuccore, SRA, BioSample) nem no BOLD, inclusive no gênero",Claude (checagem assistida),2026-11-05
+V049,Xyris villosicarinata,sem DNA,não,nenhuma,,,,sem DNA,confere,"nada no NCBI (taxonomia, nuccore, SRA, BioSample) nem no BOLD, inclusive no gênero",Claude (checagem assistida),2026-11-05
+V050,Adiantum sinuosum,sem DNA,não,nenhuma,,,,sem DNA,confere,"nada no NCBI (taxonomia, nuccore, SRA, BioSample) nem no BOLD, inclusive no gênero",Claude (checagem assistida),2026-11-05
+V051,Acianthera dichroa,a verificar,não,GenBank,Acianthera strupifolia; Specklinia picta,3,AF262855.1,sem DNA,sequências de outra espécie aceita na Flora e Funga,o WCVP junta A. dichroa a A. strupifolia; a Flora e Funga aceita as duas (e Specklinia picta),Claude (checagem assistida),2026-11-05
+V052,Anthurium lhotzkyanum,a verificar,não,GenBank,Anthurium cordatum,4,JX894812.1,sem DNA,"conceito amplo, material de fora",sequências de A. cordatum das Ilhas Virgens; o WCVP inclui A. lhotzkyanum nele,Claude (checagem assistida),2026-11-05
+V053,Aristida laevis,a verificar,não,nenhuma,,,,sem DNA,nome só como hospedeiro,o nome aparece em sequências de Fusarium (endofítico),Claude (checagem assistida),2026-11-05
+V054,Borreria apodiensis,a verificar,não,nenhuma,,,,sem DNA,confere,nada em nenhuma base,Claude (checagem assistida),2026-11-05
+V055,Calliandra germana,a verificar,não,nenhuma,,,,sem DNA,nome só como hospedeiro,o nome aparece em Burkholderia de nódulo,Claude (checagem assistida),2026-11-05
+V056,Carapichea adinantha,a verificar,não,nenhuma,,,,sem DNA,nome só como hospedeiro,o nome aparece num fungo endofítico; Stachyococcus adinanthus está na taxonomia do NCBI sem sequência,Claude (checagem assistida),2026-11-05
+V057,Chamaecrista amphibola,a verificar,não,GenBank,Chamaecrista exsudans,11,OR742618.1,sem DNA,sequências de outra espécie aceita na Flora e Funga,o WCVP junta C. amphibola a C. exsudans; a Flora e Funga aceita as duas,Claude (checagem assistida),2026-11-05
+V058,Cleistes grandiflora,a verificar,sim,ambos,Cleistes metallina,10,EU498105.1,com DNA,sinônimo heterotípico,Cleistes metallina e C. caloptera são sinônimos na Flora e Funga; os registros de Cymbidium grandiflorum no NCBI são da orquídea asiática (homônimo) e não contam,Claude (checagem assistida),2026-11-05
+V059,Conyza reitziana,a verificar,não,nenhuma,,,,sem DNA,confere,nada em nenhuma base,Claude (checagem assistida),2026-11-05
+V060,Croton allemii,a verificar,não,GenBank,Croton triqueter,9,OR622597.1,sem DNA,sequências de outra espécie aceita na Flora e Funga,o WCVP junta C. allemii a C. triqueter; a Flora e Funga aceita as duas,Claude (checagem assistida),2026-11-05
+V061,Cryptanthus argyrophyllus,a verificar,não,nenhuma,,,,sem DNA,confere,nada em nenhuma base,Claude (checagem assistida),2026-11-05
+V062,Cyclopogon garayana,a verificar,não,nenhuma,,,,sem DNA,confere,Cyclopogon garayanus está na taxonomia do NCBI sem sequência; epíteto só em outras orquídeas,Claude (checagem assistida),2026-11-05
+V063,Dimerostemma grisebachii,a verificar,não,GenBank,Verbesina helianthoides,3,ON035819.1,sem DNA,homônimo,sequências da espécie norte-americana (EUA),Claude (checagem assistida),2026-11-05
+V064,Dyckia ctenophylla,a verificar,sim,GenBank,Encholirium ctenophyllum,1,KU756187.1,com DNA,mesma espécie em outro gênero,basiônimo com o epíteto em outro gênero; o pipeline não reconheceu ctenophylla e ctenophyllum como o mesmo epíteto,Claude (checagem assistida),2026-11-05
+V065,Dyckia pierrebraunii,a verificar,não,nenhuma,,,,sem DNA,confere,nada em nenhuma base,Claude (checagem assistida),2026-11-05
+V066,Eleocharis paranapiacabensis,a verificar,não,nenhuma,,,,sem DNA,confere,nada em nenhuma base,Claude (checagem assistida),2026-11-05
+V067,Eriocaulon arechavaletae,a verificar,não,GenBank,Eriocaulon latifolium,15,MK465490.1,sem DNA,homônimo,"sequências da espécie africana (Guiné, Libéria, Serra Leoa)",Claude (checagem assistida),2026-11-05
+V068,Ferdinandusa elliptica,a verificar,sim,ambos,Ferdinandusa ovalis,6,FJ905363.1,com DNA,sinônimo heterotípico,F. ovalis é sinônimo na Flora e Funga; também 2 no BOLD,Claude (checagem assistida),2026-11-05
+V069,Fleischmannia microstemon,a verificar,não,GenBank,Brickellia paniculata (Eupatorium paniculatum),6,KM669123.1,sem DNA,homônimo,"no NCBI, Eupatorium paniculatum é Brickellia paniculata",Claude (checagem assistida),2026-11-05
+V070,Hebanthe occidentallis,a verificar,sim,GenBank,Hebanthe occidentalis,5,LS452938.1,com DNA,grafia diferente,a Flora e Funga grafa occidentallis; material da Bolívia e do Paraguai,Claude (checagem assistida),2026-11-05
+V071,Heliconia julianii,a verificar,sim,ambos,Heliconia lasiorachis; Heliconia velutina; Heliconia juliani,19,KY215580.1,com DNA,sinônimo heterotípico,sinônimos na Flora e Funga; o NCBI grafa juliani,Claude (checagem assistida),2026-11-05
+V072,Hibiscus multiformis,a verificar,não,GenBank,Abelmoschus moschatus subsp. moschatus,1,KP006667.1,sem DNA,"conceito amplo, material de fora",1 sequência da Índia; o WCVP inclui H. multiformis em A. moschatus,Claude (checagem assistida),2026-11-05
+V073,Hydrocotyle asterias,a verificar,incerto,ambos,Hydrocotyle stella; Hydrocotyle quinqueloba var.,13,MK950876.1,a verificar,"conceito amplo, material de fora","o WCVP junta H. asterias, H. alpina e H. fluminensis em H. quinqueloba; falta ver a procedência",Claude (checagem assistida),2026-11-05
+V074,Ilex euryaeformis,a verificar,não,nenhuma,,,,sem DNA,confere,nada em nenhuma base,Claude (checagem assistida),2026-11-05
+V075,Lepidaploa grisea,a verificar,não,GenBank,Lepidaploa arenaria,3,MG753277.1,sem DNA,sequências de outra espécie aceita na Flora e Funga,"Vernonia arenaria é o basiônimo de Lepidaploa arenaria, aceita na Flora e Funga",Claude (checagem assistida),2026-11-05
+V076,Lessingianthus hoveaefolius,a verificar,não,nenhuma,,,,sem DNA,confere,nada em nenhuma base,Claude (checagem assistida),2026-11-05
+V077,Luxemburgia mogolensis,a verificar,só SRA,SRA,Luxemburgia sp.,1,EU273271.1,sem DNA,só SRA,no GenBank só Luxemburgia sp. (não conta); 2 SRA,Claude (checagem assistida),2026-11-05
+V078,Macroditassa laxa,a verificar,não,nenhuma,,,,sem DNA,confere,epíteto só em Mandevilla laxa,Claude (checagem assistida),2026-11-05
+V079,Microlicia chamissois,a verificar,não,nenhuma,,,,sem DNA,confere,epíteto só em Miconia chamissois,Claude (checagem assistida),2026-11-05
+V080,Microstachys nummularifolia,a verificar,não,nenhuma,,,,sem DNA,confere,nada em nenhuma base,Claude (checagem assistida),2026-11-05
+V081,Myrcia neolucida,a verificar,sim,GenBank,Calyptranthes lucida,4,KU164866.1,com DNA,nome novo ou transferência,Myrcia neolucida é o nome novo de Calyptranthes lucida em Myrcia; material do Brasil,Claude (checagem assistida),2026-11-05
+V082,Myrcia rufopilosa,a verificar,não,ambos,Myrcia neoobscura; Myrceugenia rufa,32,PP158498.1,sem DNA,sequências de outra espécie aceita na Flora e Funga,Marlierea obscura é Myrcia neoobscura (aceita na Flora e Funga); Myrtus rufa é Myrceugenia rufa (Chile),Claude (checagem assistida),2026-11-05
+V083,Pabstiella mentigera,a verificar,não,GenBank,Pabstiella calcarata,3,MN577804.1,sem DNA,sequências de outra espécie aceita na Flora e Funga,o WCVP junta P. mentigera a P. calcarata; a Flora e Funga aceita as duas,Claude (checagem assistida),2026-11-05
+V084,Pilocarpus sulcatus,a verificar,não,nenhuma,,,,sem DNA,confere,nada em nenhuma base,Claude (checagem assistida),2026-11-05
+V085,Piper naiadense,a verificar,não,nenhuma,,,,sem DNA,confere,nada em nenhuma base,Claude (checagem assistida),2026-11-05
+V086,Pleiochiton setulosum,a verificar,sim,GenBank,Miconia pleiosetulosa,13,MG198551.1,com DNA,nome novo ou transferência,nome de Pleiochiton setulosum em Miconia,Claude (checagem assistida),2026-11-05
+V087,Psittacanthus clusiifolius,a verificar,não,GenBank,Aetanthus dichotomus (Loranthus dichotomus),1,LT599655.1,sem DNA,homônimo,"no NCBI, Loranthus dichotomus é Aetanthus dichotomus",Claude (checagem assistida),2026-11-05
+V088,Schistostemon dichotomum,a verificar,não,nenhuma,,,,sem DNA,confere,nada em nenhuma base,Claude (checagem assistida),2026-11-05
+V089,Schwenckia nova-veneciana,a verificar,não,nenhuma,,,,sem DNA,confere,nada em nenhuma base,Claude (checagem assistida),2026-11-05
+V090,Senegalia tubulifera,a verificar,não,GenBank,Senegalia riparia,15,MG833562.1,sem DNA,sequências de outra espécie aceita na Flora e Funga,o WCVP junta S. tubulifera a S. riparia; a Flora e Funga aceita as duas,Claude (checagem assistida),2026-11-05
+V091,Sida quaternata,a verificar,não,nenhuma,,,,sem DNA,confere,nada em nenhuma base,Claude (checagem assistida),2026-11-05
+V092,Sisyrinchium incurvatum,a verificar,não,ambos,Sisyrinchium vaginatum subsp. vaginatum,27,KX432962.1,sem DNA,sequências de outra espécie aceita na Flora e Funga,o WCVP junta S. incurvatum a S. vaginatum; a Flora e Funga aceita as duas,Claude (checagem assistida),2026-11-05
+V093,Syngonium vellozianum,a verificar,não,ambos,Syngonium podophyllum; Syngonium auritum,34,PX309540.1,sem DNA,"conceito amplo, material de fora","S. podophyllum cultivado (Índia, EUA, Egito, China) e S. auritum (Caribe)",Claude (checagem assistida),2026-11-05
+V094,Terminalia argentea,a verificar,não,ambos,Terminalia sericea,13,OR372180.1,sem DNA,homônimo,"sequências da espécie africana (Namíbia, África do Sul)",Claude (checagem assistida),2026-11-05
+V095,Unonopsis spectabilis,a verificar,só SRA,SRA,,,,sem DNA,nome só como hospedeiro,o nome aparece num fungo endofítico; 2 SRA,Claude (checagem assistida),2026-11-05
+V096,Varronia polystachya,a verificar,incerto,ambos,Cordia curassavica; Cordia verbenacea; Cordia brevispicata,30,MK797168.1,a verificar,"conceito amplo, material de fora",o WCVP junta V. polystachya a V. curassavica (aceita na Flora e Funga); C. brevispicata e C. verbenacea pedem um especialista,Claude (checagem assistida),2026-11-05
+V097,Xanthosoma riedelianum,a verificar,não,nenhuma,,,,sem DNA,nome só como hospedeiro,o nome aparece em vírus (Dasheen mosaic virus); o epíteto em Asterostigma riedelianum,Claude (checagem assistida),2026-11-05
+V098,Megalastrum eugenii,a verificar,sim,GenBank,Megalastrum eugenii,21,PZ291436.1,com DNA,táxon novo no NCBI,21 psbA-trnH com organismo Megalastrum eugenii; o táxon não estava no taxdump de 2026-11-04 (o alerta de texto livre pegou),Claude (checagem assistida),2026-11-05
+V099,Salvinia radula,a verificar,não,GenBank,Salvinia natans (Marsilea natans),26,PP125762.1,sem DNA,homônimo,sequências da espécie eurasiática; 3 SRA sob os nomes do mesmo epíteto,Claude (checagem assistida),2026-11-05
+V100,Trichomanes steyermakii,a verificar,não,nenhuma,,,,sem DNA,confere,nada em nenhuma base,Claude (checagem assistida),2026-11-05
+V101,Actinocephalus cipoensis,com DNA,sim,BOLD,Actinocephalus cipoensis,1,,com DNA,confere,registros da própria espécie,Claude (checagem assistida),2026-11-05
+V102,Baccharis dunensis,com DNA,sim,GenBank,Baccharis dunensis,4,MN331227.1,com DNA,confere,registros da própria espécie,Claude (checagem assistida),2026-11-05
+V103,Bursera simaruba,com DNA,sim,ambos,Bursera simaruba,921,OR892530.1,com DNA,confere,registros da própria espécie,Claude (checagem assistida),2026-11-05
+V104,Callianthe scabrida,com DNA,sim,ambos,Bakeridesia scabrida,2,JQ753305.1,com DNA,confere,registros sob o basiônimo,Claude (checagem assistida),2026-11-05
+V105,Cassia ferruginea,com DNA,sim,ambos,Cassia ferruginea,72,MG718931.1,com DNA,confere,registros da própria espécie,Claude (checagem assistida),2026-11-05
+V106,Coccoloba paraensis,com DNA,sim,GenBank,Coccoloba paraensis,3,MT326992.1,com DNA,confere,registros da própria espécie,Claude (checagem assistida),2026-11-05
+V107,Egletes viscosa,com DNA,sim,ambos,Egletes viscosa,21,JQ586845.1,com DNA,confere,registros da própria espécie,Claude (checagem assistida),2026-11-05
+V108,Eperua glabriflora,com DNA,sim,GenBank,Eperua glabriflora,15,OR146209.1,com DNA,confere,registros da própria espécie,Claude (checagem assistida),2026-11-05
+V109,Hapalorchis lineatus,com DNA,sim,ambos,Hapalorchis lineatus,11,MF465008.1,com DNA,confere,registros da própria espécie,Claude (checagem assistida),2026-11-05
+V110,Hyptis hirsuta,com DNA,sim,GenBank,Hyptis hirsuta,2,OL423222.1,com DNA,confere,registros da própria espécie,Claude (checagem assistida),2026-11-05
+V111,Krukoviella disticha,com DNA,sim,ambos,Krukoviella disticha,8,KF263441.1,com DNA,confere,registros da própria espécie,Claude (checagem assistida),2026-11-05
+V112,Microlicia chrysoglandulosa,com DNA,sim,GenBank,Microlicia chrysoglandulosa,5,OP573863.1,com DNA,confere,registros da própria espécie,Claude (checagem assistida),2026-11-05
+V113,Microlicia obtusifolia,com DNA,sim,GenBank,Microlicia obtusifolia,5,OP573864.1,com DNA,confere,registros da própria espécie,Claude (checagem assistida),2026-11-05
+V114,Myrceugenia myrcioides,com DNA,sim,ambos,Myrceugenia myrcioides,37,PP158470.1,com DNA,confere,registros da própria espécie,Claude (checagem assistida),2026-11-05
+V115,Paspalum exaltatum,com DNA,sim,GenBank,Paspalum exaltatum,14,MN178345.1,com DNA,confere,registros da própria espécie,Claude (checagem assistida),2026-11-05
+V116,Phymatidium hysteranthum,com DNA,sim,ambos,Phymatidium hysteranthum,5,KX687839.1,com DNA,confere,registros da própria espécie,Claude (checagem assistida),2026-11-05
+V117,Piper arboreum,com DNA,sim,ambos,Piper arboreum,42,PX583218.1,com DNA,confere,registros da própria espécie,Claude (checagem assistida),2026-11-05
+V118,Senega tacianae,com DNA,sim,ambos,Senega tacianae,4,MK978012.1,com DNA,confere,registros da própria espécie,Claude (checagem assistida),2026-11-05
+V119,Sloanea obtusifolia,com DNA,sim,GenBank,Sloanea obtusifolia,1,PZ470761.1,com DNA,confere,registros da própria espécie,Claude (checagem assistida),2026-11-05
+V120,Mineirella goyazensis,com DNA,sim,ambos,Mineirella goyazensis,5,PQ417498.1,com DNA,confere,registros da própria espécie,Claude (checagem assistida),2026-11-05
