@@ -46,11 +46,12 @@ incerta) e *Specklinia gomesferreirae* (ausente; há *Dryadella gomes-ferreirae*
 *Melanoxylon brauna* casou com *Melanoxylum brauna* pelo epíteto na família. A portaria não
 traz DD/NT/LC.
 
-## Decisões tomadas sem o Ricardo (rever)
+## Decisões da F1 (confirmadas pelo Ricardo em 2026-11-05)
 
-- [ ] **Híbridos fora** (80 nototáxons, como *Dyckia ×elisabethae*). Dá para incluir: o GenBank
+- [x] **Só nativas** (D-P6): cultivadas e naturalizadas ficam fora.
+- [x] **Híbridos fora** (80 nototáxons, como *Dyckia ×elisabethae*). Dá para incluir: o GenBank
       grafa "Dyckia x elisabethae".
-- [ ] **Sem origem informada fora** (3.791 aceitas sem nenhuma linha em `distribution`). Na
+- [x] **Sem origem informada fora** (3.791 aceitas sem nenhuma linha em `distribution`). Na
       amostra há exóticas (*Eucalyptus*, *Gasteria*) e nativas mal preenchidas
       (*Pleurothallis*, *Rudgea*). O Reflora também não as conta.
 - [ ] O DwC-A (20 MB) fica fora do git e é baixado a cada execução; o histórico da lista fica
@@ -107,8 +108,16 @@ traz DD/NT/LC.
 Falhas da 1ª coleta (voltam sozinhas na próxima execução): 1.192 consultas de gênero (queda
 de energia; só afetam a nota "o gênero tem N registros") e 13 do GenBank.
 
-- [ ] **Fotos**: 16.071 espécies na fila do iNaturalist a ~1 consulta/s e 20 min por execução
-      (~800 por semana): 20 semanas. Rodar uma vez à parte (~4h30) ou só para as do site.
+- [x] **Fotos**: a busca por nome (1 espécie por chamada, ~1/s) levaria ~20 semanas para as
+      16 mil da fila. Agora o nome vira id pela taxonomia que o iNaturalist publica todo mês
+      (DwC-A, ~80 MB, `data/cache/inat_ids.csv`) e a foto vem de `/v1/taxa/<30 ids>`: ~540
+      chamadas, ~10 min. Conferido contra a busca por nome em 400 espécies: mesmos 273 ids e
+      as mesmas 98 fotos. ~60% das espécies sem DNA estão no iNat; ~1/3 delas com foto CC.
+
+## F3: validação
+
+- Parceira botânica: **Maria Teresa Buril** (validação da amostra de 120 espécies e eventual
+  artigo). O Ricardo vai conversar com ela.
 
 Corrigido nos testes: o SRA e as fotos do iNaturalist só rodam para espécies já consultadas no
 GenBank; os eventos ("ganhou DNA") só contam quem já tinha sido consultado antes.
