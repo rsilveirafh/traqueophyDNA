@@ -66,32 +66,79 @@ aud <- purrr::pmap(COTAS, function(estrato, k) {
 gravar_csv(aud, "validacao/auditoria.csv")
 msg("Auditoria: ", nrow(aud), " espécies em validacao/auditoria.csv")
 
-# Planilha da auditoria: o julgamento da checagem assistida, os links e duas colunas a preencher.
-links <- select(amostra, id, bold, genbank_organism, genbank_todos, taxonomia_ncbi, flora_funga, powo)
+# Planilha da auditoria: uma pergunta de sim/não por espécie, a resposta da
+# checagem assistida ao lado e só os links que respondem a pergunta.
+url_busca <- function(nome) paste0("https://www.ncbi.nlm.nih.gov/nuccore/?term=",
+                                   utils::URLencode(paste0('"', nome, '"[Organism]'), reserved = TRUE))
 planilha <- aud |>
-  select(id, grupo, especie, situacao_painel) |>
-  left_join(select(julg, id, situacao_correta, motivo, base, nome_no_banco, n_sequencias, acesso_exemplo, comentario), by = "id") |>
-  left_join(links, by = "id") |>
-  mutate(sra = paste0("https://www.ncbi.nlm.nih.gov/sra/?term=", utils::URLencode(paste0('"', especie, '"[Organism]'), reserved = TRUE)),
-         concorda = NA_character_, situacao_auditor = NA_character_, comentario_auditor = NA_character_,
-         auditor = NA_character_)
+  select(id, especie) |>
+  left_join(select(amostra, id, familia, situacao_painel, sinonimos_buscados, genbank_organism, flora_funga), by = "id") |>
+  left_join(select(julg, id, situacao_correta, motivo, nome_no_banco, acesso_exemplo, comentario), by = "id") |>
+  mutate(
+    nome1 = str_trim(str_remove(coalesce(nome_no_banco, ""), "[;(].*$")),
+    tipo = case_when(
+      situacao_painel == "com DNA" | nome1 == especie ~ "com",
+      nzchar(nome1) & !motivo %in% c("só SRA", "nome só como hospedeiro") ~ "outro_nome",
+      TRUE ~ "nada"
+    ),
+    pergunta = case_when(
+      tipo == "com" ~ paste0("As sequências de ", especie, " no GenBank/BOLD são mesmo desta espécie?"),
+      tipo == "outro_nome" ~ paste0("As sequências de ", str_replace_all(nome_no_banco, "; ", " e "), " são de ", especie, "?"),
+      TRUE ~ paste0("Nenhuma sequência sob ", especie,
+                    ifelse(is.na(sinonimos_buscados) | sinonimos_buscados == "", "",
+                           paste0(" nem sob ", sinonimos_buscados)),
+                    ". Você conhece outro nome desta espécie?")
+    ),
+    resposta_checagem = case_when(
+      tipo == "com" & situacao_painel == "com DNA" ~ "sim",
+      tipo == "com" ~ paste0("sim: ", comentario),
+      tipo == "outro_nome" & situacao_correta == "com DNA" ~ paste0("sim: ", comentario),
+      tipo == "outro_nome" & situacao_correta == "sem DNA" ~ paste0("não: ", comentario),
+      tipo == "outro_nome" ~ paste0("não sei: ", comentario),
+      TRUE ~ paste0("não conheço: ", comentario)
+    ),
+    ver_sequencias = case_when(tipo == "outro_nome" ~ url_busca(nome1),
+                               tipo == "com" ~ url_busca(especie), TRUE ~ NA_character_),
+    exemplo = ifelse(is.na(acesso_exemplo) | acesso_exemplo == "", NA_character_,
+                     paste0("https://www.ncbi.nlm.nih.gov/nuccore/", acesso_exemplo)),
+    concorda = NA_character_, comentario_auditor = NA_character_
+  ) |>
+  select(id, especie, familia, pergunta, resposta_checagem, ver_sequencias, exemplo, flora_funga,
+         concorda, comentario_auditor)
+
+como <- data.frame(`Como preencher` = c(
+  "Cada linha tem uma pergunta e a resposta que a checagem deu.",
+  "Na coluna 'concorda', marque sim, não ou não sei. Se marcar não, escreva o porquê em 'comentario_auditor' (ex.: 'é sinônimo pro parte', 'o nome certo é X').",
+  "Links: 'ver_sequencias' abre as sequências no GenBank; 'exemplo' abre um registro (veja o voucher e o país); 'flora_funga' abre a espécie na Flora e Funga.",
+  "Quando a pergunta é 'você conhece outro nome desta espécie?', basta responder se a lista de nomes está completa.",
+  "Leva uns 5 minutos por espécie. Não precisa buscar nada além dos links."
+), check.names = FALSE)
+
 wb <- openxlsx::createWorkbook()
+openxlsx::addWorksheet(wb, "como preencher")
+openxlsx::writeData(wb, "como preencher", como)
+openxlsx::setColWidths(wb, "como preencher", cols = 1, widths = 140)
+openxlsx::addStyle(wb, "como preencher", openxlsx::createStyle(wrapText = TRUE, valign = "top"),
+                   rows = 1:6, cols = 1)
 openxlsx::addWorksheet(wb, "auditoria")
 openxlsx::writeData(wb, "auditoria", planilha)
-for (col in c("bold", "genbank_organism", "genbank_todos", "taxonomia_ncbi", "flora_funga", "powo", "sra")) {
-  v <- planilha[[col]]; class(v) <- "hyperlink"
-  openxlsx::writeData(wb, "auditoria", x = v, startCol = match(col, names(planilha)), startRow = 2, colNames = FALSE)
+for (col in c("ver_sequencias", "exemplo", "flora_funga")) {
+  v <- planilha[[col]]
+  rotulo <- c(ver_sequencias = "ver sequências", exemplo = "ver registro", flora_funga = "ver na Flora e Funga")[[col]]
+  f <- ifelse(is.na(v), "", paste0('HYPERLINK("', v, '", "', rotulo, '")'))
+  class(f) <- "formula"
+  openxlsx::writeData(wb, "auditoria", x = f, startCol = match(col, names(planilha)), startRow = 2, colNames = FALSE)
 }
 n <- nrow(planilha)
 openxlsx::dataValidation(wb, "auditoria", cols = match("concorda", names(planilha)), rows = 2:(n + 1),
-                         type = "list", value = '"sim,não,em parte"')
-openxlsx::dataValidation(wb, "auditoria", cols = match("situacao_auditor", names(planilha)), rows = 2:(n + 1),
-                         type = "list", value = '"com DNA,sem DNA,a verificar"')
+                         type = "list", value = '"sim,não,não sei"')
+quebra <- openxlsx::createStyle(wrapText = TRUE, valign = "top")
+openxlsx::addStyle(wb, "auditoria", quebra, rows = 2:(n + 1), cols = seq_along(planilha), gridExpand = TRUE, stack = TRUE)
 openxlsx::addStyle(wb, "auditoria", openxlsx::createStyle(fgFill = "#fff3d6"), rows = 1:(n + 1),
                    cols = match("concorda", names(planilha)):ncol(planilha), gridExpand = TRUE, stack = TRUE)
 openxlsx::addStyle(wb, "auditoria", openxlsx::createStyle(textDecoration = "bold"), rows = 1,
                    cols = seq_along(planilha), stack = TRUE)
-openxlsx::freezePane(wb, "auditoria", firstActiveRow = 2, firstActiveCol = 4)
-openxlsx::setColWidths(wb, "auditoria", cols = seq_along(planilha), widths = "auto")
-openxlsx::setColWidths(wb, "auditoria", cols = match("comentario", names(planilha)), widths = 50)
+openxlsx::freezePane(wb, "auditoria", firstActiveRow = 2, firstActiveCol = 3)
+openxlsx::setColWidths(wb, "auditoria", cols = seq_along(planilha),
+                       widths = c(6, 24, 16, 50, 50, 16, 14, 20, 11, 40))
 openxlsx::saveWorkbook(wb, "validacao/auditoria.xlsx", overwrite = TRUE)
