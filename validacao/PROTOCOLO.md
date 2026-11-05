@@ -95,6 +95,33 @@ O que isso diz:
 
 Correções no pipeline sugeridas pela validação: ver `notas/pendencias.md` (F3).
 
+### Depois das correções (coleta de 2026-11-05, 18h)
+
+As regras novas (seção F3 de `notas/pendencias.md`) reconsultaram 3.515 espécies no GenBank. Também
+deixou de ser motivo de "a verificar" o "nome não encontrado no WCVP" sem nenhuma sequência: as 17
+assim, na amostra, eram todas sem DNA.
+
+| Situação | Antes | Depois |
+|---|---|---|
+| com DNA | 17.930 | 18.303 |
+| sem DNA | 15.928 | 16.829 |
+| a verificar | 1.349 | 75 |
+
+- Das 1.349 "a verificar": 389 viraram com DNA (a estimativa era ~216, IC 112–385), 885 sem DNA e
+  75 seguem a verificar, todas com sequências só sob um sinônimo do WCVP.
+- 17 "com DNA" viraram sem DNA. As sequências eram de outra planta com o mesmo binômio (*Vitis
+  palmata*, norte-americana, para *Cissus palmata*; *Derris scandens*, asiática; *Dioscorea
+  spicata*) ou de outra espécie da lista (*Sophronitis brevicaulis* é *Cattleya harpophylla* no
+  NCBI; *Matelea linearis* é *Blepharodon lineare*). Eram falsos positivos (~0,1% das "com DNA").
+- 1 "sem DNA" virou com DNA (*Vanilla verrucosa*, sob o sinônimo *Vanilla angustipetala*).
+- Na amostra, o painel agora concorda com o julgamento em **115 de 120**:
+  - *Hibiscus multiformis* e *Syngonium vellozianum* seguem "a verificar". O julgamento olhou a
+    origem das sequências (material de fora), o que o pipeline não faz.
+  - *Hydrocotyle asterias* e *Varronia polystachya* ficaram "sem DNA". O julgamento dizia "a
+    verificar", mas o WCVP junta as duas com outra espécie e os nomes do WCVP saíram da busca.
+  - *Psittacanthus clusiifolius* ficou "com DNA" por um sinônimo da Flora e Funga (*Loranthus
+    dichotomus*) que, no NCBI, é outra planta (*Aetanthus dichotomus*, andina).
+
 ## 4. Auditoria humana
 
 `auditoria.xlsx` traz 20 espécies sorteadas por estrato, com mais peso nos casos que mudam de

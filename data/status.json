@@ -3,5 +3,7 @@
   "especies": 35207,
   "genbank_pendentes": 0,
   "ncbi_chave": true,
-  "avisos": []
+  "avisos": [
+    "BOLD: usando o último resultado salvo"
+  ]
 }

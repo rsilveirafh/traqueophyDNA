@@ -146,6 +146,24 @@ amostra: as 6 mudaram como o julgamento; 3.514 espécies voltam para a fila do G
 - [x] **Nome só como hospedeiro** (fungo, bactéria, vírus): o alerta de texto livre não deveria
       virar "a verificar" sozinho; pode ser só nota, como o do gênero.
 
+- [x] **Nome ausente do WCVP** sem nenhuma sequência deixa de ser "a verificar" e vira nota (17 de
+      17 na amostra eram sem DNA; eram 474 das 549 que sobraram).
+
+**2ª coleta, com as regras novas** (2026-11-05, 18:13 a 19:07, local): GenBank 3.515 espécies em
+37 min, SRA 787 em 5 min. Resultado: **18.303 com DNA (52%), 16.829 sem DNA (48%), 75 a
+verificar**. Por grupo (com / sem / a verificar): angiospermas 17.344 / 16.384 / 68; samambaias e
+licófitas 941 / 438 / 7; gimnospermas 18 / 7 / 0. Os 390 "eventos" da coleta eram efeito da mudança
+de regra, não DNA novo: `eventos.csv` voltou a ter só o cabeçalho. Detalhes em
+`validacao/PROTOCOLO.md` (seção 3, "Depois das correções").
+
+- [ ] **BOLD bloqueado (403 do Cloudflare)** para este IP desde a tarde de 2026-11-05: o portal inteiro,
+      não só a API. Provavelmente por causa das centenas de buscas da checagem assistida. A coleta usou
+      o resumo salvo às 15:21 do mesmo dia. Conferir se passa; na Action o IP é outro.
+- [ ] **Sinônimo da Flora e Funga que no NCBI é outra planta fora da lista** (*Loranthus dichotomus*
+      → *Aetanthus dichotomus*, 1 caso na amostra). `limpa_nomes_ncbi()` só tira o nome quando a
+      outra planta está na lista. Avaliar se vale tirar também quando o nome científico do NCBI não
+      é nenhum dos nomes da espécie.
+
 Corrigido nos testes: o SRA e as fotos do iNaturalist só rodam para espécies já consultadas no
 GenBank; os eventos ("ganhou DNA") só contam quem já tinha sido consultado antes.
 

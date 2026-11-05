@@ -49,9 +49,10 @@ monta_cobertura <- function(especies, bold_cob, genbank, generos, sra = NULL, no
           if (isTRUE(dq)) m <- c(m, paste0("há sequências só sob sinônimo do WCVP (pode ser um conceito mais amplo da espécie)",
                                            if (!is.na(bs)) paste0(" (BOLD: ", gsub(";", ", ", bs), ")")))
           if (is.na(ng)) m <- c(m, "GenBank ainda não consultado")
-          if (identical(ws, "ausente")) m <- c(m, "nome não encontrado no WCVP (sinônimos globais não conferidos)")
           # Ter sinônimos, ou ser sinônimo no WCVP, não é motivo: todos os nomes
           # (da Flora e Funga e do WCVP, inclusive o aceito no WCVP) foram buscados.
+          # Nome ausente do WCVP também não: sem nenhuma sequência, é nota (na
+          # validação, as 17 assim eram todas sem DNA).
           if (length(m)) paste(m, collapse = "; ") else NA_character_
         }),
       # Notas que não mudam a situação, mas ajudam quem for conferir.
@@ -65,6 +66,7 @@ monta_cobertura <- function(especies, bold_cob, genbank, generos, sra = NULL, no
         !is.na(wcvp_junta_com) ~ paste0("o WCVP trata como sinônimo de ", wcvp_junta_com,
                                         ", aceita na Flora e Funga: os nomes do WCVP não foram buscados"),
         wcvp_situacao %in% "sinonimo" ~ "o nome da lista é sinônimo no WCVP (o nome aceito lá também foi buscado)",
+        wcvp_situacao %in% "ausente" ~ "nome não encontrado no WCVP (só os sinônimos da Flora e Funga foram buscados)",
         TRUE ~ NA_character_
       ),
       # citado fora do campo Organism: em geral como hospedeiro (fungo, bactéria, vírus)
