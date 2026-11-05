@@ -51,10 +51,4 @@ No último trabalho, como Analista de Inovação na [Seteg](https://www.setegce.
 
 ## Contato
 
-Escreva para [rsilveirafh@gmail.com](mailto:rsilveirafh@gmail.com). Achou uma espécie com situação errada, um sinônimo que faltou ou um nome desatualizado? [Abra uma correção no GitHub](https://github.com/rsilveirafh/traqueophyDNA/issues/new?labels=correcao). Para adotar uma espécie, veja [Adote uma espécie](adote.qmd).
-
-## Como citar
-
-> da Silveira-Filho, R. R. (2026). *traqueophyDNA: a lacuna de DNA das plantas vasculares do Brasil*. <https://rsilveirafh.github.io/traqueophyDNA/>
-
-Os dados (`data/cobertura.csv`) são CC-BY 4.0 e o código é MIT. Cite também as listas de espécies e as bases de sequências usadas, listadas em [Fontes e método](sobre.qmd).
+Escreva para [rsilveirafh@gmail.com](mailto:rsilveirafh@gmail.com). Achou uma espécie com situação errada, um sinônimo que faltou ou um nome desatualizado? [Abra uma correção no GitHub](https://github.com/rsilveirafh/traqueophyDNA/issues/new?labels=correcao). Para adotar uma espécie, veja [Adote uma espécie](adote.qmd). Para citar o painel, veja [Como citar](sobre.qmd#como-citar), em Método.

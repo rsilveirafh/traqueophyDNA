@@ -183,6 +183,8 @@ md`> da Silveira-Filho, R. R. (2026). *traqueophyDNA: a lacuna de DNA das planta
 }
 ```
 
+Os dados (`data/cobertura.csv`) são CC-BY 4.0 e o código é MIT.
+
 Cite também as fontes dos dados:
 
 - Flora e Funga do Brasil. Jardim Botânico do Rio de Janeiro.
