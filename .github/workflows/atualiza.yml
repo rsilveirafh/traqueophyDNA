@@ -35,12 +35,12 @@ jobs:
         with:
           cache-version: 1
 
-      - name: Coleta (listas, CTFB, BOLD, GenBank)
+      - name: Coleta (Flora e Funga, MMA, WCVP, NCBI, BOLD, GenBank, SRA)
         env:
           NCBI_API_KEY: ${{ secrets.NCBI_API_KEY }}
           NCBI_EMAIL: ${{ secrets.NCBI_EMAIL }}
         run: |
-          ARGS="--max-minutos=270"
+          ARGS="--max-minutos=300"
           if [ -n "${{ github.event.inputs.max_genbank }}" ]; then
             ARGS="$ARGS --max-genbank=${{ github.event.inputs.max_genbank }}"
           fi

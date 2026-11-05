@@ -1,59 +1,72 @@
-# Junta lista + CTFB + BOLD + GenBank (+ SRA) em data/cobertura.csv -------------
+# Junta lista + WCVP + BOLD + GenBank (+ SRA) em data/cobertura.csv -------------
 
-# Gênero com pelo menos este número de registros no GenBank torna "a verificar"
-# uma espécie que aparece sem DNA (o grupo é bem amostrado; vale conferir nome).
+# Gênero com pelo menos este número de registros no GenBank: vira nota na
+# observação ("vale conferir o nome"), mas não muda a situação. No tetrapoDNA era
+# motivo de "a verificar"; a validação mostrou que quase todas eram sem DNA mesmo.
 LIMIAR_GENERO <- 500
+
+# Até quantos nomes alternativos a observação lista um a um.
+MAX_NOMES_OBS <- 8
 
 faixa_gaplist <- function(n) {
   # Mesmas faixas do iBOL Europe Gap List (prioridade por nº de registros no BOLD).
   cut(n, c(-Inf, 0, 2, 9, Inf), labels = c("0", "1-2", "3-9", "10+")) |> as.character()
 }
 
-monta_cobertura <- function(especies, bold_cob, genbank, generos, sra = NULL) {
+junta_obs <- function(a, b) ifelse(is.na(b), a, ifelse(is.na(a), b, paste0(a, "; ", b)))
+
+monta_cobertura <- function(especies, bold_cob, genbank, generos, sra = NULL, nomes_ncbi = NULL) {
   x <- especies |>
-    left_join(bold_cob, by = c("classe", "especie")) |>
+    left_join(bold_cob, by = "especie") |>
     left_join(select(genbank, especie, n_genbank, n_genbank_nome, n_genbank_comb,
                      any_of("n_genbank_texto"), genbank_consultado_em = consultado_em),
               by = "especie") |>
     left_join(select(generos, genero, n_genbank_genero), by = "genero")
   x <- if (is.null(sra)) mutate(x, n_sra = NA_integer_) else left_join(x, select(sra, especie, n_sra), by = "especie")
-  if (!"gbif_situacao" %in% names(x)) x$gbif_situacao <- NA_character_
   if (!"n_genbank_texto" %in% names(x)) x$n_genbank_texto <- NA_integer_
+  x$no_ncbi <- if (is.null(nomes_ncbi)) NA else x$especie %in% nomes_ncbi$especie
+  x$n_sinonimos <- ifelse(is.na(x$sinonimos), 0L, lengths(strsplit(x$sinonimos, ";")))
 
   x |>
     mutate(
-      # com DNA = sob o nome da lista ou sob outra combinação do mesmo epíteto
-      dna_nome = n_bold_comb > 0 | coalesce(n_genbank_comb, 0L) > 0,
-      so_comb = dna_nome & !(n_bold_nome > 0 | coalesce(n_genbank_nome, 0L) > 0),
-      dna_qualquer = n_bold > 0 | coalesce(n_genbank, 0L) > 0,
+      # com DNA = sob o nome da lista ou outra combinação do mesmo epíteto
+      # (inclusive os infraespecíficos da espécie)
+      dna_nome = coalesce(n_bold_comb, 0L) > 0 | coalesce(n_genbank_comb, 0L) > 0,
+      so_comb = dna_nome & !(coalesce(n_bold_nome, 0L) > 0 | coalesce(n_genbank_nome, 0L) > 0),
+      dna_qualquer = coalesce(n_bold, 0L) > 0 | coalesce(n_genbank, 0L) > 0,
       motivos = pmap_chr(
-        list(dna_nome, dna_qualquer, ctfb_situacao, sinonimos, n_genbank_genero,
-             bold_br_genero_sem_id, bold_sinonimos_com_dado, n_genbank, gbif_situacao,
-             n_genbank_texto),
-        function(dn, dq, cs, sn, gg, gs, bs, ng, gb, nt) {
+        list(dna_nome, dna_qualquer, wcvp_situacao, bold_sinonimos_com_dado, n_genbank, n_genbank_texto),
+        function(dn, dq, ws, bs, ng, nt) {
           if (isTRUE(dn)) return(NA_character_)
           m <- character()
           if (isTRUE(nt > 0)) m <- c(m, paste0("o nome aparece em ", nt, " registro(s) do GenBank fora do campo Organism"))
-          if (identical(gb, "nao_reconhecido")) m <- c(m, "nome não reconhecido no GBIF (sinônimos não conferidos)")
           if (isTRUE(dq)) m <- c(m, paste0("há sequências só sob nome alternativo",
                                            if (!is.na(bs)) paste0(" (BOLD: ", gsub(";", ", ", bs), ")")))
           if (is.na(ng)) m <- c(m, "GenBank ainda não consultado")
-          if (cs == "ausente") m <- c(m, "nome não encontrado no CTFB (sinônimos não conferidos)")
-          if (cs == "sinonimo") m <- c(m, "o nome da lista é sinônimo no CTFB")
-          # Ter sinônimos não é motivo: eles já foram buscados (ver nota_sinonimos).
-          if (isTRUE(gg >= LIMIAR_GENERO)) m <- c(m, paste0("o gênero tem ", format(gg, big.mark = ".", decimal.mark = ","), " registros no GenBank"))
+          if (identical(ws, "ausente")) m <- c(m, "nome não encontrado no WCVP (sinônimos globais não conferidos)")
+          # Ter sinônimos, ou ser sinônimo no WCVP, não é motivo: todos os nomes
+          # (da Flora e Funga e do WCVP, inclusive o aceito no WCVP) foram buscados.
           if (length(m)) paste(m, collapse = "; ") else NA_character_
         }),
       # Notas que não mudam a situação, mas ajudam quem for conferir.
-      nota_sinonimos = ifelse(!dna_qualquer & !is.na(sinonimos),
-                              paste0("sinônimos buscados: ", gsub(";", ", ", sinonimos)),
-                              NA_character_),
+      nota_sinonimos = case_when(
+        dna_qualquer | n_sinonimos == 0 ~ NA_character_,
+        n_sinonimos <= MAX_NOMES_OBS ~ paste0("nomes alternativos buscados: ", gsub(";", ", ", sinonimos)),
+        TRUE ~ paste0(n_sinonimos, " nomes alternativos buscados (Flora e Funga e WCVP)")
+      ),
+      nota_wcvp = ifelse(!dna_nome & wcvp_situacao %in% "sinonimo",
+                         "o nome da lista é sinônimo no WCVP (o nome aceito lá também foi buscado)", NA_character_),
+      nota_ncbi = ifelse(!dna_nome & no_ncbi %in% FALSE,
+                         "nenhum dos nomes está na taxonomia do NCBI", NA_character_),
+      nota_genero = ifelse(!dna_nome & coalesce(n_genbank_genero, 0L) >= LIMIAR_GENERO,
+                           paste0("o gênero tem ", format(n_genbank_genero, big.mark = ".", decimal.mark = ","),
+                                  " registros no GenBank"), NA_character_),
       # Leituras brutas no SRA: marca a espécie sem sequência montada; não muda a situação.
       dados_brutos = !dna_nome & coalesce(n_sra, 0L) > 0,
       nota_sra = ifelse(dados_brutos,
                         paste0("só dados brutos: ", n_sra, " registro(s) de leituras no SRA, nenhuma sequência montada no BOLD ou no GenBank"),
                         NA_character_),
-      nota_bold = ifelse(!dna_nome & bold_br_genero_sem_id > 0,
+      nota_bold = ifelse(!dna_nome & coalesce(bold_br_genero_sem_id, 0L) > 0,
                          paste0(bold_br_genero_sem_id, " registro(s) do gênero coletados no Brasil sem identificação até espécie no BOLD"),
                          NA_character_),
       situacao = case_when(
@@ -63,25 +76,26 @@ monta_cobertura <- function(especies, bold_cob, genbank, generos, sra = NULL) {
       ),
       observacao = case_when(
         situacao == "sem DNA" ~ "nenhuma sequência depositada no BOLD ou no GenBank sob este nome e os sinônimos conhecidos",
-        so_comb ~ paste0("DNA só sob outra combinação do mesmo epíteto (",
-                         map2_chr(especie, sinonimos, ~ paste(mesmo_epiteto(.x, strsplit(coalesce(.y, ""), ";")[[1]]), collapse = ", ")),
+        so_comb ~ paste0("DNA só sob outra combinação do mesmo epíteto ou nome infraespecífico (",
+                         map2_chr(especie, sinonimos, ~ paste(head(mesmo_epiteto(.x, strsplit(coalesce(.y, ""), ";")[[1]]), MAX_NOMES_OBS), collapse = ", ")),
                          ")"),
         TRUE ~ motivos
       ),
-      observacao = ifelse(is.na(nota_sinonimos), observacao,
-                          ifelse(is.na(observacao), nota_sinonimos, paste0(observacao, "; ", nota_sinonimos))),
-      observacao = ifelse(is.na(nota_sra), observacao,
-                          ifelse(is.na(observacao), nota_sra, paste0(observacao, "; ", nota_sra))),
-      observacao = ifelse(is.na(nota_bold), observacao,
-                          ifelse(is.na(observacao), nota_bold, paste0(observacao, "; ", nota_bold))),
-      faixa_bold = faixa_gaplist(n_bold),
+      observacao = junta_obs(observacao, nota_sinonimos),
+      observacao = junta_obs(observacao, nota_wcvp),
+      observacao = junta_obs(observacao, nota_ncbi),
+      observacao = junta_obs(observacao, nota_genero),
+      observacao = junta_obs(observacao, nota_sra),
+      observacao = junta_obs(observacao, nota_bold),
+      faixa_bold = faixa_gaplist(coalesce(n_bold, 0L)),
       atualizado_em = hoje()
     ) |>
+    # `sinonimos` fica em data/especies.csv e data/wcvp.csv: aqui pesaria no site.
     select(grupo, classe, ordem, familia, genero, especie, autoria, ano_descricao,
-           endemica_br, categoria_ameaca, fonte_ameaca, ufs, uf_fonte, biomas,
+           endemica_br, categoria_ameaca, fonte_ameaca, ufs, uf_fonte, biomas, forma_vida, substrato,
            situacao, dados_brutos, observacao, n_bold, n_bold_br, n_bold_nome, n_genbank,
            n_genbank_nome, n_genbank_texto, n_sra, faixa_bold, n_genbank_genero, bold_br_genero_sem_id,
-           sinonimos, ctfb_situacao, gbif_situacao, id_ctfb, nota_lista, versao_lista,
+           n_sinonimos, wcvp_situacao, no_ncbi, id_ffb, nota_lista, versao_lista,
            genbank_consultado_em, atualizado_em) |>
     arrange(grupo, familia, especie)
 }
@@ -98,7 +112,8 @@ atualiza_historico <- function(cob, destino = "data/historico.csv") {
     cob |> group_by(grupo) |> resumo(),
     cob |> resumo() |> mutate(grupo = "total")
   ) |> mutate(data = hoje(), .before = 1)
-  ant <- ler_csv(destino, col_types = cols(data = col_character(), grupo = col_character()))
+  ant <- ler_csv(destino, col_types = cols(data = col_character(), grupo = col_character(),
+                                           .default = col_integer()))
   out <- bind_rows(if (!is.null(ant)) filter(ant, data != hoje()), novo) |> arrange(data, grupo)
   gravar_csv(out, destino)
 }
@@ -115,7 +130,10 @@ atualiza_eventos <- function(cob_nova, cob_antiga, destino = "data/eventos.csv")
   }
   ev <- cob_nova |>
     select(grupo, especie, para = situacao, n_bold, n_genbank) |>
-    inner_join(select(cob_antiga, especie, de = situacao), by = "especie") |>
+    # só quem já tinha sido consultado no GenBank: "a verificar" por falta de
+    # consulta não é lacuna fechada
+    inner_join(cob_antiga |> filter(!is.na(n_genbank)) |> select(especie, de = situacao),
+               by = "especie") |>
     filter(de != "com DNA", para == "com DNA") |>
     mutate(data = hoje(), .before = 1) |>
     select(data, grupo, especie, de, para, n_bold, n_genbank)

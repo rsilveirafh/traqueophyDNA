@@ -30,25 +30,53 @@ espécies sem sequência montada que têm leituras no SRA. O painel nunca afirma
 risco da **falsa órfã**: o banco usa um nome antigo); a coluna `observacao` diz o motivo de cada
 "a verificar".
 
-## Fontes (previstas)
+## Fontes
 
 - **Flora e Funga do Brasil** (JBRJ), Darwin Core Archive no IPT
   (`ipt.jbrj.gov.br/jbrj`, recurso `lista_especies_flora_brasil`;
   [doi:10.15468/1mtkaw](https://doi.org/10.15468/1mtkaw)), CC-BY: lista, sinônimos, UF, domínio
-  fitogeográfico, endemismo, origem e forma de vida.
-- **WCVP** (Royal Botanic Gardens, Kew), pacotes `rWCVP`/`rWCVPdata`: sinônimos globais.
-- **Taxonomia do NCBI** (`taxdump`, `names.dmp`): pré-filtro antes de consultar o GenBank.
-- **BOLD Systems** (portal v5) e **NCBI E-utilities** (`nuccore` e `sra`).
-- **Lista Nacional Oficial das Espécies da Flora Ameaçadas de Extinção** (MMA, 2026).
+  fitogeográfico, endemismo, origem e forma de vida. Baixada a cada execução (20 MB, fora do git).
+- **Portaria GM/MMA nº 1.783/2026** (Lista Nacional Oficial das Espécies da Flora Ameaçadas de
+  Extinção), CSV do [Portal de Dados Abertos do MMA](https://dados.mma.gov.br/dataset/especies-ameacadas).
+- **WCVP** (World Checklist of Vascular Plants, Royal Botanic Gardens, Kew),
+  `sftp.kew.org/pub/data-repositories/WCVP/wcvp.zip`: sinônimos globais e ano de publicação.
+  Refeito a cada 90 dias (`data/wcvp.csv`).
+- **Taxonomia do NCBI** (`taxdump`, `names.dmp`, só Viridiplantae): só os nomes que o NCBI
+  conhece entram na consulta [Organism] do GenBank e do SRA (`data/ncbi_taxonomia.csv`).
+- **BOLD Systems**, portal v5: `GET https://portal.boldsystems.org/api/summary?query=tax:phylum:Tracheophyta&fields=species&reduce=false`
+  (uma chamada; outra com `;geo:country/ocean:Brazil`). Sem chave.
+- **NCBI E-utilities**: `esearch.fcgi?db=nuccore&term=("Gênero epíteto"[Organism] OR ...)&rettype=count`
+  e o mesmo em `db=sra`. Sem chave: 3 req/s; com `NCBI_API_KEY`: 10 req/s.
+- **iNaturalist**: foto (licença Creative Commons) das espécies sem DNA.
 - **IBGE**, malha de UFs, para o mapa.
+
+## Estrutura
+
+```
+R/listas.R      Flora e Funga -> esquema comum (vasculares nativas, nível de espécie)
+R/ameaca.R      categoria nacional (Portaria MMA 1.783/2026)
+R/wcvp.R        WCVP: sinônimos globais e ano de descrição
+R/taxdump.R     taxonomia do NCBI: quais nomes podem ter registro
+R/bold.R        BOLD: resumo do filo, soma sob nome + sinônimos
+R/genbank.R     NCBI: contagem incremental com cache, pausa e retry
+R/sra.R         NCBI SRA: leituras brutas das espécies sem sequência montada
+R/junta.R       situação, observação, histórico e eventos
+R/fotos.R       iNaturalist
+scripts/atualiza.R  pipeline completo
+data/           saídas versionadas (o diff do git é o histórico)
+data-raw/       cópias das fontes pequenas (portaria, malha do IBGE)
+notas/          pendências e registro de decisões
+```
 
 ## Como rodar
 
 Requisitos: R ≥ 4.3 e Quarto ≥ 1.5.
 
 ```sh
-Rscript scripts/atualiza.R   # coleta (ainda a adaptar para plantas)
-quarto preview               # site
+Rscript scripts/atualiza.R --so-lista                 # só data/especies.csv
+Rscript scripts/atualiza.R --max-genbank=500          # um pedaço do GenBank
+Rscript scripts/atualiza.R                            # coleta completa
+quarto preview                                        # site
 ```
 
 Variáveis de ambiente opcionais: `NCBI_API_KEY` e `NCBI_EMAIL` (em `.Renviron`, fora do git).

@@ -99,3 +99,16 @@ junta_ufs <- function(x) {
   x <- intersect(UFS, unique(x[!is.na(x)]))
   if (length(x) == 0) NA_character_ else paste(sort(x), collapse = ";")
 }
+
+# Mesma espécie em outra combinação: outro gênero com o mesmo epíteto (tolerando a
+# concordância -us/-a/-um) ou nome infraespecífico cujo epíteto específico ou
+# infraespecífico é o da espécie (variedades e subespécies somam na espécie;
+# variedade elevada a espécie: "Aus bus var. cus" -> "Xus cus").
+mesmo_epiteto <- function(nome, outros) {
+  if (!length(outros)) return(character())
+  raiz <- function(e) substr(e, 1, pmax(4, nchar(e) - 2))
+  e <- raiz(word(nome, 2))
+  ep_sp <- raiz(word(outros, 2))
+  ep_inf <- ifelse(str_count(outros, " ") >= 3, raiz(word(outros, 4)), NA_character_)
+  outros[ep_sp == e | (!is.na(ep_inf) & ep_inf == e)]
+}

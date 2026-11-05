@@ -1,1 +1,5 @@
 data,grupo,n_especies,com_dna,sem_dna,a_verificar,com_bold,com_genbank,registros_bold,registros_genbank,so_dados_brutos
+2026-11-05,angiospermas,33796,16981,15535,1280,9722,17449,31244,4377852,1247
+2026-11-05,gimnospermas,25,18,7,0,13,18,79,3976,1
+2026-11-05,samambaias,1386,931,386,69,403,962,1308,142221,38
+2026-11-05,total,35207,17930,15928,1349,10138,18429,32631,4524049,1286

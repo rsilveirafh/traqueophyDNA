@@ -8,8 +8,8 @@ status = FileAttachment("data/status.json").json()
 REPO = "{{< meta website.repo-url >}}"
 
 ROTULO_GRUPO = new Map([
-  ["anfibios", "Anfíbios"], ["repteis", "Répteis"],
-  ["aves", "Aves"], ["mamiferos", "Mamíferos"]
+  ["angiospermas", "Angiospermas"], ["gimnospermas", "Gimnospermas"],
+  ["samambaias", "Samambaias e licófitas"]
 ])
 OPCOES_GRUPO = ["Todos", ...ROTULO_GRUPO.values()]
 GRUPO_POR_ROTULO = new Map([...ROTULO_GRUPO].map(([k, v]) => [v, k]))

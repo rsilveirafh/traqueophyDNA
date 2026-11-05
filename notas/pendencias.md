@@ -56,12 +56,66 @@ traz DD/NT/LC.
 - [ ] O DwC-A (20 MB) fica fora do git e é baixado a cada execução; o histórico da lista fica
       no diff de `data/especies.csv`.
 
-## F2: DNA (a fazer)
+## F2: DNA (em andamento, 2026-11-04)
 
-- [ ] Pré-filtro pelo `taxdump` do NCBI (`names.dmp`).
-- [ ] Sinônimos globais do WCVP (`rWCVP`, `rWCVPdata`, não instalados) e ano de descrição.
-- [ ] BOLD: como o portal v5 organiza Tracheophyta; resumo por classe ou por família.
-- [ ] `mesmo_epiteto()`: em plantas, variedade elevada a espécie muda o epíteto da espécie
-      (*Aus bus* var. *cus* → *Xus cus*); tratar o epíteto infraespecífico como o da espécie.
-- [ ] Trocar `ctfb_situacao`/`id_ctfb` por `id_ffb` em `R/junta.R` e no site.
-- [ ] Cronometrar a 1ª coleta (limite de 6 h por job na Action).
+- [x] **WCVP** (`R/wcvp.R`): baixado direto do SFTP da Kew (`wcvp.zip`, `wcvp_names.csv`), sem
+      os pacotes `rWCVP`/`rWCVPdata`. 31.831 espécies aceitas no WCVP, 2.658 sinônimos (o nome
+      aceito lá também é buscado), 718 ausentes. Ano de descrição completado para 34.489.
+      Refeito a cada 90 dias (`data/wcvp.csv`).
+- [x] **Pré-filtro pela taxonomia do NCBI** (`R/taxdump.R`): subárvore de Viridiplantae
+      (442 mil táxons, 583 mil nomes). **32.405 de 35.207** espécies têm algum nome no NCBI;
+      só esses nomes entram no `[Organism]`. As outras 2.802 ganham 0 sem consulta e passam só
+      pela busca em texto livre. Refeito a cada 7 dias ou quando muda o conjunto de nomes.
+- [x] **BOLD**: o portal v5 responde para o filo inteiro (`tax:phylum:Tracheophyta`) em ~5 s:
+      115.356 nomes, 367.562 registros (só 5.188 coletados no Brasil). As classes do BOLD não
+      seguem as da Flora e Funga (Gnetales em Pinopsida): casamento só pelo nome.
+- [x] `mesmo_epiteto()` trata o epíteto infraespecífico (variedade elevada a espécie).
+- [x] `id_ffb` e `wcvp_situacao` no lugar de `id_ctfb`/`ctfb_situacao`/`gbif_situacao`.
+- [x] **Ritmo do NCBI.** Em série, cada chamada leva ~0,4 s (~2,5 req/s, abaixo do limite de
+      10 req/s da chave). Com requisições paralelas (`httr2::req_perform_parallel`, 8 conexões,
+      `req_throttle` a 9 req/s), o NCBI entrega ~4 req/s: o teto é do servidor (16 conexões ou
+      sem limitador não melhoram). GenBank: ~2,5 espécies/s (~2,2 chamadas por espécie).
+- [x] **1ª coleta completa** (local, 2026-11-04 21:11 a 2026-11-05 13:31, com o PC suspenso
+      ~11 h no meio e uma queda de energia). Tempo efetivo: **GenBank ~3h50** para 32.507
+      espécies; SRA ~55 min para 12.599; gêneros ~4 min. Cabe nas 5 h da Action, mas as
+      semanais são menores: órfãs a cada 6+ dias (~16 mil, ~1h45) e com DNA a cada 28 dias
+      (~4,5 mil por semana).
+
+**Resultado da 1ª coleta** (35.207 espécies):
+
+| Situação | Espécies | % |
+|---|---|---|
+| com DNA | 17.930 | 51 |
+| sem DNA | 15.928 | 45 |
+| a verificar | 1.349 | 4 |
+
+- Por grupo: angiospermas 16.981 / 15.535 / 1.280; samambaias e licófitas 931 / 386 / 69;
+  gimnospermas 18 / 7 / 0 (com / sem / a verificar).
+- Sem DNA: endêmicas 54%, não endêmicas 32%; ameaçadas (Portaria 1.783) 52%, demais 45%.
+- Famílias grandes: Fabaceae 27% sem DNA, Poaceae 36%, Melastomataceae 38%, Bromeliaceae 43%,
+  Orchidaceae 44%, Asteraceae 53%, Euphorbiaceae 53%, Myrtaceae 54%, Malvaceae 57%,
+  Rubiaceae 59%.
+- 10.138 espécies com registro no BOLD; 1.286 só com dados brutos no SRA; 181 sem DNA cujo
+  nome aparece em texto livre no GenBank (candidatas a falsa órfã).
+- **A taxonomia do NCBI tem muitos nomes sem sequência**: 42% das espécies com nome no NCBI
+  estão sem DNA. Conferido à mão (*Neocouma parviflora*, *Spigelia spruceana*, *Bulbostylis
+  distichoides*, *Mollinedia argyrogyna*: tax_id existe, 0 no nuccore e 0 em proteína). O
+  pré-filtro descarta menos que o esperado (só 2.802 espécies), mas não erra.
+- "A verificar": a maioria é "há sequências só sob nome alternativo" e "nome ausente do WCVP e
+  do NCBI".
+
+Falhas da 1ª coleta (voltam sozinhas na próxima execução): 1.192 consultas de gênero (queda
+de energia; só afetam a nota "o gênero tem N registros") e 13 do GenBank.
+
+- [ ] **Fotos**: 16.071 espécies na fila do iNaturalist a ~1 consulta/s e 20 min por execução
+      (~800 por semana): 20 semanas. Rodar uma vez à parte (~4h30) ou só para as do site.
+
+Corrigido nos testes: o SRA e as fotos do iNaturalist só rodam para espécies já consultadas no
+GenBank; os eventos ("ganhou DNA") só contam quem já tinha sido consultado antes.
+
+## F4: lembrar
+
+- `data/cobertura.csv` tem ~12 MB com 35 mil espécies: pesado para o site no celular. Avaliar
+  uma versão enxuta para o navegador (colunas do site, ou só as não "com DNA" com detalhe).
+- `index.qmd` e `sobre.qmd` ainda têm silhuetas e textos do tetrapoDNA (classes, "uma consulta
+  por classe" ao BOLD).

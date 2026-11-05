@@ -10,12 +10,20 @@
 #   esearch.fcgi?db=sra&term=("Gênero epíteto"[Organism] OR ...)&rettype=count
 # Cache incremental em data/sra.csv (validade de 28 dias).
 
-atualiza_sra <- function(especies, destino = "data/sra.csv", dias_validade = 28, max_minutos = Inf) {
+# `nomes_ncbi` (especie, nome): só os nomes que existem na taxonomia do NCBI entram
+# (o SRA usa a mesma taxonomia); a espécie sem nenhum fica com 0 sem consulta.
+atualiza_sra <- function(especies, nomes_ncbi, destino = "data/sra.csv", dias_validade = 28, max_minutos = Inf) {
+  conhecidos <- split(nomes_ncbi$nome, nomes_ncbi$especie)
   alvo <- especies |>
     mutate(termo = map2_chr(especie, sinonimos, function(e, s) {
-      termo_ncbi(unique(c(e, mesmo_epiteto(e, if (is.na(s)) character() else strsplit(s, ";")[[1]]))))
+      n <- intersect(unique(c(e, mesmo_epiteto(e, if (is.na(s)) character() else strsplit(s, ";")[[1]]))),
+                     conhecidos[[e]])
+      if (length(n)) termo_ncbi(n) else NA_character_
     })) |>
     select(especie, termo)
+  fora <- filter(alvo, is.na(termo)) |>
+    mutate(termo = "(nenhum nome na taxonomia do NCBI)", n_sra = 0L, consultado_em = hoje())
+  alvo <- filter(alvo, !is.na(termo))
   cache <- ler_csv(destino, col_types = cols(n_sra = col_integer(), .default = col_character()))
   if (is.null(cache)) cache <- tibble(especie = character(), termo = character(), n_sra = integer(),
                                        consultado_em = character())
@@ -25,14 +33,18 @@ atualiza_sra <- function(especies, destino = "data/sra.csv", dias_validade = 28,
   falta <- anti_join(alvo, validos, by = "especie")
   msg("SRA (dados brutos): ", nrow(falta), " consultas")
   inicio <- Sys.time()
-  novos <- vector("list", nrow(falta))
-  for (i in seq_len(nrow(falta))) {
-    novos[[i]] <- tibble(especie = falta$especie[i], termo = falta$termo[i],
-                         n_sra = ncbi_conta(falta$termo[i], db = "sra"), consultado_em = hoje())
-    if (i %% 200 == 0) msg("  ", i, "/", nrow(falta))
+  novos <- list()
+  blocos <- split(seq_len(nrow(falta)), ceiling(seq_len(nrow(falta)) / 500))
+  for (b in seq_along(blocos)) {
+    f <- falta[blocos[[b]], ]
+    novos[[b]] <- tibble(especie = f$especie, termo = f$termo,
+                         n_sra = ncbi_conta_lote(f$termo, db = "sra"), consultado_em = hoje())
+    msg("  ", max(blocos[[b]]), "/", nrow(falta))
     if (as.numeric(difftime(Sys.time(), inicio, units = "mins")) > max_minutos) break
   }
-  out <- bind_rows(validos, bind_rows(novos)) |> arrange(especie)
+  novos <- bind_rows(novos)
+  if (nrow(novos)) novos <- filter(novos, !is.na(n_sra))   # falha volta na próxima
+  out <- bind_rows(validos, novos, fora) |> arrange(especie)
   gravar_csv(out, destino)
   out
 }
