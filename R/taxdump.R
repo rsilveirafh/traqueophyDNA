@@ -102,3 +102,21 @@ atualiza_taxdump <- function(especies, destino = "data/ncbi_taxonomia.csv", dias
   writeLines(dig, arq_digital)
   out
 }
+
+# Nome que, na taxonomia do NCBI, é de outra espécie aceita na Flora e Funga (o NCBI
+# o trata como sinônimo dela) sai da busca: as sequências sob ele são da outra
+# espécie (validação, 2026-11-05: Pleurothallis picta -> Specklinia picta). Também
+# saem os nomes que deixaram de ser buscados (sinônimos filtrados em soma_wcvp).
+limpa_nomes_ncbi <- function(nomes_ncbi, especies) {
+  buscados <- especies |>
+    transmute(especie, nome = map2(especie, sinonimos, ~ c(.x, if (!is.na(.y)) strsplit(.y, ";")[[1]]))) |>
+    unnest(nome)
+  x <- semi_join(nomes_ncbi, buscados, by = c("especie", "nome"))
+  outra <- x |>
+    mutate(sci = strsplit(coalesce(nome_ncbi, ""), ";")) |>
+    unnest(sci) |>
+    filter(nome != especie, sci != especie, sci %in% especies$especie) |>
+    distinct(especie, nome)
+  if (nrow(outra)) msg("NCBI taxonomia: ", nrow(outra), " nome(s) fora da busca (no NCBI são de outra espécie da lista)")
+  anti_join(x, outra, by = c("especie", "nome"))
+}

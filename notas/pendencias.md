@@ -124,22 +124,26 @@ de energia; só afetam a nota "o gênero tem N registros") e 13 do GenBank.
 - [ ] Auditoria humana: `validacao/auditoria.xlsx` (20 espécies, 14 delas "a verificar"), Ricardo
       e Maria Teresa, cada um sem ver a resposta do outro.
 
-Correções no pipeline que a validação sugere (a fazer; mudam ~1.000 "a verificar" de lugar):
+Correções no pipeline que a validação sugeriu (feitas em 2026-11-05; teste com 6 espécies da
+amostra: as 6 mudaram como o julgamento; 3.514 espécies voltam para a fila do GenBank):
 
-- [ ] **WCVP junta com outra espécie aceita na Flora e Funga** (8 de 50 na amostra). Quando o
+- [x] **WCVP junta com outra espécie aceita na Flora e Funga** (8 de 50 na amostra). Quando o
       nome aceito no WCVP é outra espécie da lista, não somar os sinônimos do WCVP que a Flora e
       Funga dá a essa outra espécie (nem o basiônimo dela). Regra: um nome que a Flora e Funga
       atribui a outra espécie (nome aceito ou sinônimo) sai dos nomes alternativos.
-- [ ] **Homônimos** (6 de 50). Um sinônimo cujo binômio é nome aceito de outra planta no WCVP
+- [x] **Homônimos** (6 de 50). Um sinônimo cujo binômio é nome aceito de outra planta no WCVP
       (*Terminalia sericea* Cambess. × Burch. ex DC.) sai da busca. E, na taxonomia do NCBI, um
       nome que lá é sinônimo de uma espécie aceita na Flora e Funga que não é a nossa também sai.
-- [ ] **`mesmo_epiteto()`** compara a raiz cortando 2 letras: *ctenophylla* e *ctenophyllum* não
+- [x] **`mesmo_epiteto()`** compara a raiz cortando 2 letras: *ctenophylla* e *ctenophyllum* não
       casam. Cortar a terminação (-a, -us, -um, -is, -e) e aceitar 1 letra de diferença na raiz
       (pega também *occidentallis*/*occidentalis*).
-- [ ] **Táxon novo no NCBI** depois do taxdump: quando o texto livre acha registros e o organismo
+- [x] **Táxon novo no NCBI** depois do taxdump: quando o texto livre acha registros e o organismo
       deles é o nome da lista, contar como com DNA (*Megalastrum eugenii*). O taxdump semanal
       resolve na semana seguinte, mas vale a regra.
-- [ ] **Nome só como hospedeiro** (fungo, bactéria, vírus): o alerta de texto livre não deveria
+- [x] **Sinônimo da Flora e Funga com DNA conta como "com DNA"** (`n_genbank_ffb`, `n_bold_ffb`);
+      só nomes que vêm apenas do WCVP deixam "a verificar". No WCVP, 565 espécies juntadas a outra
+      da lista e 4.349 com algum nome ambíguo; nomes buscados: de 133 mil para 119 mil.
+- [x] **Nome só como hospedeiro** (fungo, bactéria, vírus): o alerta de texto livre não deveria
       virar "a verificar" sozinho; pode ser só nota, como o do gênero.
 
 Corrigido nos testes: o SRA e as fotos do iNaturalist só rodam para espécies já consultadas no

@@ -101,14 +101,26 @@ junta_ufs <- function(x) {
 }
 
 # Mesma espécie em outra combinação: outro gênero com o mesmo epíteto (tolerando a
-# concordância -us/-a/-um) ou nome infraespecífico cujo epíteto específico ou
-# infraespecífico é o da espécie (variedades e subespécies somam na espécie;
-# variedade elevada a espécie: "Aus bus var. cus" -> "Xus cus").
+# concordância de gênero, -us/-a/-um, -is/-e) ou nome infraespecífico cujo epíteto
+# específico ou infraespecífico é o da espécie (variedades e subespécies somam na
+# espécie; variedade elevada a espécie: "Aus bus var. cus" -> "Xus cus").
+# Raízes longas (6+ letras) aceitam 1 letra de diferença: grafias variantes
+# ("occidentallis"/"occidentalis"). Só se aplica a nomes que já são sinônimos.
+raiz_epiteto <- function(e) {
+  r <- sub("(us|um|a|is|e|os|on|er)$", "", e)
+  ifelse(nchar(r) >= 3, r, e)
+}
+
 mesmo_epiteto <- function(nome, outros) {
   if (!length(outros)) return(character())
-  raiz <- function(e) substr(e, 1, pmax(4, nchar(e) - 2))
-  e <- raiz(word(nome, 2))
-  ep_sp <- raiz(word(outros, 2))
-  ep_inf <- ifelse(str_count(outros, " ") >= 3, raiz(word(outros, 4)), NA_character_)
-  outros[ep_sp == e | (!is.na(ep_inf) & ep_inf == e)]
+  e <- raiz_epiteto(word(nome, 2))
+  casa <- function(r) {
+    ok <- !is.na(r) & r == e
+    longa <- !is.na(r) & !ok & nchar(r) >= 6 & nchar(e) >= 6
+    if (any(longa)) ok[longa] <- drop(utils::adist(e, r[longa])) <= 1
+    ok
+  }
+  ep_sp <- raiz_epiteto(word(outros, 2))
+  ep_inf <- ifelse(str_count(outros, " ") >= 3, raiz_epiteto(word(outros, 4)), NA_character_)
+  outros[casa(ep_sp) | casa(ep_inf)]
 }

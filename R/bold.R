@@ -53,9 +53,12 @@ atualiza_bold <- function(consulta = BOLD_TAXON, pasta = "data/cache") {
 cobre_bold <- function(especies, bold) {
   idx <- bold |> select(nome, n_bold, n_bold_br)
   nomes <- especies |>
-    select(especie, sinonimos) |>
-    mutate(nome = map2(especie, sinonimos, function(e, s) unique(c(e, if (!is.na(s)) strsplit(s, ";")[[1]])))) |>
+    select(especie, sinonimos, sinonimos_ffb) |>
+    mutate(nome = map2(especie, sinonimos, function(e, s) unique(c(e, if (!is.na(s)) strsplit(s, ";")[[1]]))),
+           ffb = map(sinonimos_ffb, function(s) if (is.na(s)) character() else strsplit(s, ";")[[1]])) |>
     unnest(nome) |>
+    mutate(da_ffb = map2_lgl(nome, ffb, `%in%`)) |>
+    select(-ffb) |>
     left_join(idx, by = "nome") |>
     mutate(across(c(n_bold, n_bold_br), ~ coalesce(.x, 0L)))
   por_sp <- nomes |>
@@ -63,6 +66,8 @@ cobre_bold <- function(especies, bold) {
     summarise(
       n_bold_nome = sum(n_bold[nome == especie]),
       n_bold_comb = sum(n_bold[nome == especie | nome %in% mesmo_epiteto(first(especie), nome)]),
+      # sob o nome, o mesmo epíteto ou um sinônimo da Flora e Funga: conta como "com DNA"
+      n_bold_ffb = sum(n_bold[nome == especie | da_ffb | nome %in% mesmo_epiteto(first(especie), nome)]),
       n_bold = sum(n_bold), n_bold_br = sum(n_bold_br),
       bold_sinonimos_com_dado = paste(nome[nome != especie & n_bold > 0], collapse = ";"),
       .groups = "drop"

@@ -19,28 +19,34 @@ monta_cobertura <- function(especies, bold_cob, genbank, generos, sra = NULL, no
   x <- especies |>
     left_join(bold_cob, by = "especie") |>
     left_join(select(genbank, especie, n_genbank, n_genbank_nome, n_genbank_comb,
-                     any_of("n_genbank_texto"), genbank_consultado_em = consultado_em),
+                     any_of(c("n_genbank_texto", "n_genbank_ffb")), genbank_consultado_em = consultado_em),
               by = "especie") |>
     left_join(select(generos, genero, n_genbank_genero), by = "genero")
   x <- if (is.null(sra)) mutate(x, n_sra = NA_integer_) else left_join(x, select(sra, especie, n_sra), by = "especie")
   if (!"n_genbank_texto" %in% names(x)) x$n_genbank_texto <- NA_integer_
+  if (!"n_genbank_ffb" %in% names(x)) x$n_genbank_ffb <- x$n_genbank_comb
+  if (!"n_bold_ffb" %in% names(x)) x$n_bold_ffb <- x$n_bold_comb
+  if (!"wcvp_junta_com" %in% names(x)) x$wcvp_junta_com <- NA_character_
+  if (!"sinonimos_ffb" %in% names(x)) x$sinonimos_ffb <- NA_character_
   x$no_ncbi <- if (is.null(nomes_ncbi)) NA else x$especie %in% nomes_ncbi$especie
   x$n_sinonimos <- ifelse(is.na(x$sinonimos), 0L, lengths(strsplit(x$sinonimos, ";")))
 
   x |>
     mutate(
-      # com DNA = sob o nome da lista ou outra combinação do mesmo epíteto
-      # (inclusive os infraespecíficos da espécie)
-      dna_nome = coalesce(n_bold_comb, 0L) > 0 | coalesce(n_genbank_comb, 0L) > 0,
-      so_comb = dna_nome & !(coalesce(n_bold_nome, 0L) > 0 | coalesce(n_genbank_nome, 0L) > 0),
+      # com DNA = sob o nome da lista, outra combinação do mesmo epíteto (inclusive
+      # os infraespecíficos) ou um sinônimo da Flora e Funga (validação, 2026-11-05)
+      dna_comb = coalesce(n_bold_comb, 0L) > 0 | coalesce(n_genbank_comb, 0L) > 0,
+      dna_nome = dna_comb | coalesce(n_bold_ffb, 0L) > 0 | coalesce(n_genbank_ffb, 0L) > 0,
+      so_comb = dna_comb & !(coalesce(n_bold_nome, 0L) > 0 | coalesce(n_genbank_nome, 0L) > 0),
+      so_ffb = dna_nome & !dna_comb,
       dna_qualquer = coalesce(n_bold, 0L) > 0 | coalesce(n_genbank, 0L) > 0,
       motivos = pmap_chr(
-        list(dna_nome, dna_qualquer, wcvp_situacao, bold_sinonimos_com_dado, n_genbank, n_genbank_texto),
-        function(dn, dq, ws, bs, ng, nt) {
+        list(dna_nome, dna_qualquer, wcvp_situacao, bold_sinonimos_com_dado, n_genbank),
+        function(dn, dq, ws, bs, ng) {
           if (isTRUE(dn)) return(NA_character_)
           m <- character()
-          if (isTRUE(nt > 0)) m <- c(m, paste0("o nome aparece em ", nt, " registro(s) do GenBank fora do campo Organism"))
-          if (isTRUE(dq)) m <- c(m, paste0("há sequências só sob nome alternativo",
+          # nomes só do WCVP: sinônimo global, às vezes um conceito mais amplo
+          if (isTRUE(dq)) m <- c(m, paste0("há sequências só sob sinônimo do WCVP (pode ser um conceito mais amplo da espécie)",
                                            if (!is.na(bs)) paste0(" (BOLD: ", gsub(";", ", ", bs), ")")))
           if (is.na(ng)) m <- c(m, "GenBank ainda não consultado")
           if (identical(ws, "ausente")) m <- c(m, "nome não encontrado no WCVP (sinônimos globais não conferidos)")
@@ -54,8 +60,18 @@ monta_cobertura <- function(especies, bold_cob, genbank, generos, sra = NULL, no
         n_sinonimos <= MAX_NOMES_OBS ~ paste0("nomes alternativos buscados: ", gsub(";", ", ", sinonimos)),
         TRUE ~ paste0(n_sinonimos, " nomes alternativos buscados (Flora e Funga e WCVP)")
       ),
-      nota_wcvp = ifelse(!dna_nome & wcvp_situacao %in% "sinonimo",
-                         "o nome da lista é sinônimo no WCVP (o nome aceito lá também foi buscado)", NA_character_),
+      nota_wcvp = case_when(
+        dna_nome ~ NA_character_,
+        !is.na(wcvp_junta_com) ~ paste0("o WCVP trata como sinônimo de ", wcvp_junta_com,
+                                        ", aceita na Flora e Funga: os nomes do WCVP não foram buscados"),
+        wcvp_situacao %in% "sinonimo" ~ "o nome da lista é sinônimo no WCVP (o nome aceito lá também foi buscado)",
+        TRUE ~ NA_character_
+      ),
+      # citado fora do campo Organism: em geral como hospedeiro (fungo, bactéria, vírus)
+      nota_texto = ifelse(!dna_nome & coalesce(n_genbank_texto, 0L) > 0,
+                          paste0("o nome aparece em ", n_genbank_texto,
+                                 " registro(s) do GenBank fora do campo Organism (em geral como hospedeiro)"),
+                          NA_character_),
       nota_ncbi = ifelse(!dna_nome & no_ncbi %in% FALSE,
                          "nenhum dos nomes está na taxonomia do NCBI", NA_character_),
       nota_genero = ifelse(!dna_nome & coalesce(n_genbank_genero, 0L) >= LIMIAR_GENERO,
@@ -76,6 +92,9 @@ monta_cobertura <- function(especies, bold_cob, genbank, generos, sra = NULL, no
       ),
       observacao = case_when(
         situacao == "sem DNA" ~ "nenhuma sequência depositada no BOLD ou no GenBank sob este nome e os sinônimos conhecidos",
+        so_ffb ~ paste0("DNA só sob sinônimo da Flora e Funga (",
+                        map_chr(sinonimos_ffb, ~ paste(head(strsplit(coalesce(.x, ""), ";")[[1]], MAX_NOMES_OBS), collapse = ", ")),
+                        ")"),
         so_comb ~ paste0("DNA só sob outra combinação do mesmo epíteto ou nome infraespecífico (",
                          map2_chr(especie, sinonimos, ~ paste(head(mesmo_epiteto(.x, strsplit(coalesce(.y, ""), ";")[[1]]), MAX_NOMES_OBS), collapse = ", ")),
                          ")"),
@@ -84,6 +103,7 @@ monta_cobertura <- function(especies, bold_cob, genbank, generos, sra = NULL, no
       observacao = junta_obs(observacao, nota_sinonimos),
       observacao = junta_obs(observacao, nota_wcvp),
       observacao = junta_obs(observacao, nota_ncbi),
+      observacao = junta_obs(observacao, nota_texto),
       observacao = junta_obs(observacao, nota_genero),
       observacao = junta_obs(observacao, nota_sra),
       observacao = junta_obs(observacao, nota_bold),
@@ -95,7 +115,7 @@ monta_cobertura <- function(especies, bold_cob, genbank, generos, sra = NULL, no
            endemica_br, categoria_ameaca, fonte_ameaca, ufs, uf_fonte, biomas, forma_vida, substrato,
            situacao, dados_brutos, observacao, n_bold, n_bold_br, n_bold_nome, n_genbank,
            n_genbank_nome, n_genbank_texto, n_sra, faixa_bold, n_genbank_genero, bold_br_genero_sem_id,
-           n_sinonimos, wcvp_situacao, no_ncbi, id_ffb, nota_lista, versao_lista,
+           n_sinonimos, wcvp_situacao, wcvp_junta_com, no_ncbi, id_ffb, nota_lista, versao_lista,
            genbank_consultado_em, atualizado_em) |>
     arrange(grupo, familia, especie)
 }

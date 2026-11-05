@@ -44,9 +44,11 @@ wcvp <- tryCatch(atualiza_wcvp(especies), error = function(e) {
 if (!is.null(wcvp)) {
   especies <- soma_wcvp(especies, wcvp)
 } else {
-  especies <- mutate(especies, sinonimos = sinonimos_lista, wcvp_situacao = NA_character_)
+  especies <- mutate(especies, sinonimos = sinonimos_lista, sinonimos_ffb = sinonimos_lista,
+                     wcvp_situacao = NA_character_, wcvp_junta_com = NA_character_)
 }
-gravar_csv(select(especies, -sinonimos, -wcvp_situacao), "data/especies.csv")
+gravar_csv(select(especies, -any_of(c("sinonimos", "sinonimos_ffb", "wcvp_situacao", "wcvp_junta_com"))),
+           "data/especies.csv")
 msg("Espécies: ", nrow(especies))
 print(count(especies, grupo))
 if (so_lista) quit(save = "no")
@@ -57,6 +59,7 @@ nomes_ncbi <- tryCatch(atualiza_taxdump(especies), error = function(e) {
   ler_csv("data/ncbi_taxonomia.csv", col_types = cols(.default = col_character()))
 })
 if (is.null(nomes_ncbi)) stop("taxdump do NCBI indisponível e sem cópia local")
+nomes_ncbi <- limpa_nomes_ncbi(nomes_ncbi, especies)
 
 # 4. BOLD ------------------------------------------------------------------------
 bold <- atualiza_bold()
@@ -77,10 +80,10 @@ generos <- atualiza_generos(provis$genero)
 
 # 6b. SRA: leituras brutas das que seguem sem sequência montada (só marca) ---------
 sem_montada <- especies |>
-  left_join(select(bold_cob, especie, n_bold_comb), by = "especie") |>
-  left_join(select(genbank, especie, n_genbank_comb), by = "especie") |>
+  left_join(select(bold_cob, especie, n_bold_ffb), by = "especie") |>
+  left_join(select(genbank, especie, n_genbank_ffb), by = "especie") |>
   # só quem o GenBank já consultou (as pendentes entram quando forem consultadas)
-  filter(coalesce(n_bold_comb, 0L) == 0, !is.na(n_genbank_comb), n_genbank_comb == 0)
+  filter(coalesce(n_bold_ffb, 0L) == 0, !is.na(n_genbank_ffb), n_genbank_ffb == 0)
 sra <- tryCatch(atualiza_sra(sem_montada, nomes_ncbi, max_minutos = 0.7 * resta()), error = function(e) {
   avisos <<- c(avisos, paste("SRA indisponível:", conditionMessage(e)))
   ler_csv("data/sra.csv", col_types = cols(n_sra = col_integer(), .default = col_character()))

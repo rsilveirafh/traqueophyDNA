@@ -67,30 +67,40 @@ atualiza_genbank <- function(especies, nomes_ncbi, destino = "data/genbank.csv",
              todos <- unique(c(e, if (!is.na(s)) strsplit(s, ";")[[1]]))
              intersect(todos, conhecidos[[e]])
            }),
+           nomes_ffb = pmap(list(especie, sinonimos_ffb, nomes), function(e, s, n) {
+             intersect(c(e, if (!is.na(s)) strsplit(s, ";")[[1]]), n)
+           }),
            termo = map2_chr(especie, nomes, function(e, n) {
              if (length(n)) termo_ncbi(n) else paste0("texto:\"", e, "\"")
            })) |>
-    select(especie, termo, nomes)
+    select(especie, termo, nomes, nomes_ffb)
   cache <- ler_csv(destino, col_types = cols(n_genbank = col_integer(),
                                               n_genbank_nome = col_integer(),
                                               n_genbank_comb = col_integer(),
                                               n_genbank_texto = col_integer(),
+                                              n_genbank_ffb = col_integer(),
                                               .default = col_character()))
   if (!is.null(cache) && !"n_genbank_comb" %in% names(cache)) {
     cache$n_genbank_comb <- ifelse(cache$n_genbank == cache$n_genbank_nome, cache$n_genbank_nome, NA)
   }
+  if (!is.null(cache) && !"n_genbank_ffb" %in% names(cache)) {
+    # sem registro fora do nome/epíteto, já se sabe; o resto volta para a fila
+    # (inclusive quem só tinha o nome em texto livre: pode ser táxon novo no NCBI)
+    cache$n_genbank_ffb <- ifelse(cache$n_genbank == cache$n_genbank_comb & coalesce(cache$n_genbank_texto, 0L) == 0,
+                                  cache$n_genbank_comb, NA)
+  }
   if (is.null(cache)) {
     cache <- tibble(especie = character(), termo = character(), n_genbank = integer(),
                     n_genbank_nome = integer(), n_genbank_comb = integer(),
-                    n_genbank_texto = integer(), consultado_em = character())
+                    n_genbank_texto = integer(), n_genbank_ffb = integer(), consultado_em = character())
   }
   fila <- alvo |>
     left_join(select(cache, especie, termo_ant = termo, n_ant = n_genbank,
-                     comb_ant = n_genbank_comb, data_ant = consultado_em), by = "especie") |>
+                     comb_ant = n_genbank_comb, ffb_ant = n_genbank_ffb, data_ant = consultado_em), by = "especie") |>
     mutate(
       idade = as.numeric(as.Date(hoje()) - as.Date(data_ant)),
       prioridade = case_when(
-        is.na(n_ant) | is.na(comb_ant) | is.na(termo_ant) | termo_ant != termo ~ 1,  # nova, falhou ou mudou
+        is.na(n_ant) | is.na(comb_ant) | is.na(ffb_ant) | is.na(termo_ant) | termo_ant != termo ~ 1,  # nova, falhou ou mudou
         n_ant == 0 & idade >= dias_orfa ~ 2,                     # órfã: rechecar toda semana
         idade >= dias_validade ~ 3,                              # vencida
         TRUE ~ 9
@@ -98,8 +108,9 @@ atualiza_genbank <- function(especies, nomes_ncbi, destino = "data/genbank.csv",
     ) |>
     filter(prioridade < 9) |>
     arrange(prioridade, desc(idade))
+  pendentes <- nrow(fila)
   fila <- head(fila, max_consultas)
-  msg("GenBank: ", nrow(fila), " consultas na fila (",
+  msg("GenBank: ", nrow(fila), " consultas na fila", if (pendentes > nrow(fila)) paste0(" de ", pendentes, " pendentes"), " (",
       if (nzchar(ncbi_chave())) "com" else "sem", " chave NCBI)")
   if (nrow(fila) == 0) return(cache)
 
@@ -162,8 +173,29 @@ conta_bloco_genbank <- function(fila) {
   n_nome[is.na(n)] <- NA_integer_
   n_comb[is.na(n)] <- NA_integer_
 
+  # 4) sob o nome, o mesmo epíteto ou um sinônimo da Flora e Funga (n_genbank_ffb):
+  #    conta como "com DNA"; o que sobra (nomes só do WCVP) fica "a verificar"
+  ffb <- pmap(list(comb, fila$nomes_ffb), function(cb, f) union(cb, f))
+  n_ffb <- n_comb
+  mais_ffb <- !is.na(n) & !is.na(n_comb) & n > n_comb
+  todos_ffb <- mais_ffb & map2_lgl(ffb, nomes, ~ setequal(.x, .y))
+  n_ffb[todos_ffb] <- n[todos_ffb]
+  q_ffb <- mais_ffb & !todos_ffb & lengths(ffb) > lengths(comb)
+  n_ffb[q_ffb] <- ncbi_conta_lote(map_chr(ffb[q_ffb], termo_ncbi))
+
+  # 5) nome fora da taxonomia do NCBI baixada, mas citado em texto livre: pode
+  #    ser táxon novo (validação: Megalastrum eugenii); confere no campo Organism
+  q_novo <- !tem & coalesce(n_texto, 0L) > 0
+  if (any(q_novo)) {
+    r <- ncbi_conta_lote(termo_ncbi_vec(e[q_novo]))
+    novo <- which(q_novo)[!is.na(r) & r > 0]
+    r <- r[!is.na(r) & r > 0]
+    n[novo] <- r; n_nome[novo] <- r; n_comb[novo] <- r; n_ffb[novo] <- r
+  }
+
   tibble(especie = e, termo = fila$termo, n_genbank = n, n_genbank_nome = n_nome,
-         n_genbank_comb = n_comb, n_genbank_texto = n_texto, consultado_em = hoje())
+         n_genbank_comb = n_comb, n_genbank_texto = n_texto, n_genbank_ffb = n_ffb,
+         consultado_em = hoje())
 }
 
 termo_ncbi_vec <- function(nomes) paste0("(\"", nomes, "\"[Organism])")
