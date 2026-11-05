@@ -166,3 +166,34 @@ com DNA, a cada 4 semanas.
 md`Código e dados no [GitHub](${REPO}). Código sob licença MIT; tabelas derivadas sob CC-BY 4.0
 (cite a Flora e Funga do Brasil, o WCVP e este painel).`
 ```
+
+## Como citar
+
+```{ojs}
+md`> da Silveira-Filho, R. R. (2026). *traqueophyDNA: a lacuna de DNA das plantas vasculares do
+> Brasil*. Dados de ${status.atualizado_em}. <https://rsilveirafh.github.io/traqueophyDNA/>`
+```
+
+```bibtex
+@misc{traqueophydna,
+  author = {da Silveira-Filho, Ricardo Rodrigues},
+  title  = {traqueophyDNA: a lacuna de DNA das plantas vasculares do Brasil},
+  year   = {2026},
+  url    = {https://rsilveirafh.github.io/traqueophyDNA/}
+}
+```
+
+Cite também as fontes dos dados:
+
+- Flora e Funga do Brasil. Jardim Botânico do Rio de Janeiro.
+  <https://floradobrasil.jbrj.gov.br> (lista, sinônimos e distribuição).
+- Govaerts, R., Nic Lughadha, E., Black, N., Turner, R. & Paton, A. (2021). The World Checklist of
+  Vascular Plants, a continuously updated resource for exploring global plant diversity. *Scientific
+  Data* 8: 215. [doi:10.1038/s41597-021-00997-6](https://doi.org/10.1038/s41597-021-00997-6)
+- Ratnasingham, S. & Hebert, P. D. N. (2007). BOLD: The Barcode of Life Data System. *Molecular
+  Ecology Notes* 7: 355–364.
+  [doi:10.1111/j.1471-8286.2007.01678.x](https://doi.org/10.1111/j.1471-8286.2007.01678.x)
+- Sayers, E. W. et al. (2024). GenBank 2024 update. *Nucleic Acids Research* 52: D134–D137.
+  [doi:10.1093/nar/gkad903](https://doi.org/10.1093/nar/gkad903)
+- Brasil. Ministério do Meio Ambiente. Portaria GM/MMA nº 1.783, de 26 de outubro de 2026 (Lista
+  Nacional Oficial das Espécies da Flora Ameaçadas de Extinção).

@@ -1,15 +1,15 @@
 /*-- scss:defaults --*/
-// Versão noturna do "caderno de campo" (mesmos nomes de tema-claro.scss).
+// Versão noturna do "herbário" (mesmos nomes de tema-claro.scss).
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Inter:wght@400;500;600&display=swap');
 
-$cc-tinta: #ece7da;
-$cc-papel: #161b19;
-$cc-cartao: #1e2522;
-$cc-regua: #39443f;
-$cc-apagado: #a7ada4;
-$cc-mata: #7fb894;
-$cc-mata-link: #9fcdb0;
-$cc-com: #6f8f76;
+$cc-tinta: #e4eddf;
+$cc-papel: #121a15;
+$cc-cartao: #19241d;
+$cc-regua: #324638;
+$cc-apagado: #a3b2a5;
+$cc-mata: #8fd19f;
+$cc-mata-link: #a9e0b6;
+$cc-com: #6fa877;
 $cc-verificar: #d6a23a;
 $cc-sem: #e07a4f;
 $cc-brutos: #9db8d3;
@@ -20,8 +20,8 @@ $body-color: $cc-tinta;
 $primary: $cc-mata;
 $link-color: $cc-mata-link;
 $border-color: $cc-regua;
-$navbar-bg: #0f1311;
-$navbar-fg: #e9e3d3;
+$navbar-bg: #0e1812;
+$navbar-fg: #e6f0df;
 $navbar-hl: #ffffff;
 $footer-bg: $cc-papel;
 $footer-fg: $cc-apagado;

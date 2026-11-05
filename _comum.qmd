@@ -23,10 +23,10 @@ SUBSTRATOS = ["Terrícola", "Rupícola", "Epífita", "Hemiepífita", "Aquática"
               "Hemiparasita", "Saprófita"]
 
 // Cores de situação (as mesmas de tema-claro.scss; tons médios que funcionam
-// no claro e no escuro): sálvia / ocre / terracota. E uma cor por grupo.
+// no claro e no escuro): verde-folha / ocre / terracota. E uma cor por grupo.
 SITUACOES = ["com DNA", "a verificar", "sem DNA"]
-COR_SITUACAO = ["#8fae8f", "#d6a23a", "#c4633a"]
-COR_GRUPO = ["#2f6b4f", "#b8532c", "#5b6f8a"]
+COR_SITUACAO = ["#8cc283", "#d6a23a", "#c4633a"]
+COR_GRUPO = ["#3a8a55", "#b8532c", "#5b6f8a"]
 
 // Portaria MMA 1.783/2026: CR, EN e VU (com "(infra)" quando só há infraespecíficos
 // listados e "(PE)" para possivelmente extinta).

@@ -118,7 +118,7 @@ escolhe_uf = uf => {
   const mapa = Plot.plot({
     width: w, height: w * 0.97, style: {fontFamily: "Inter, sans-serif", fontSize: "12px", background: "transparent"},
     projection: {type: "mercator", domain: fc},
-    color: {type: "linear", range: ["#f1e8d6", "#9a4322"], legend: true, label: metrica,
+    color: {type: "linear", range: ["#eef3e4", "#9a4322"], legend: true, label: metrica,
             tickFormat: metrica === "% sem DNA" ? fmtpct : fmtn},
     marks: [
       Plot.geo(fc, {fill: f => valor(f.properties), stroke: "var(--cc-papel)", strokeWidth: 1,
@@ -130,7 +130,7 @@ ${fmtn(f.properties.verificar)} a verificar
 ${fmtn(f.properties.brutos)} das sem DNA só com dados brutos
 clique para ver a lista`}),
       Plot.geo(feats.filter(f => f.properties.uf === uf_sel), {stroke: "var(--cc-tinta)", strokeWidth: 2.5}),
-      Plot.text(fc.features, Plot.centroid({text: f => f.properties.uf, fill: "#1d2421", stroke: "#f7f4ec",
+      Plot.text(fc.features, Plot.centroid({text: f => f.properties.uf, fill: "#1b2a20", stroke: "#f1f6ec",
         strokeWidth: 3, fontSize: 10, fontWeight: 600, pointerEvents: "none"}))
     ]
   });
