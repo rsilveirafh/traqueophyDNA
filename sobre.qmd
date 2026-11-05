@@ -10,20 +10,21 @@ format: html
 
 # Como o painel conta o DNA de cada espécie
 
-[De onde vêm as listas e as sequências, o que quer dizer cada situação e como evitamos a "falsa órfã".]{.cc-intro}
+[De onde vêm a lista e as sequências, o que quer dizer cada situação e como evitamos a "falsa órfã".]{.cc-intro}
 :::
 
 ## A pergunta
 
-Para cada espécie de **tetrápode do Brasil** (anfíbios, répteis, aves e mamíferos) nas listas
-oficiais das sociedades científicas: quantas sequências de DNA públicas existem no
-[BOLD Systems](https://boldsystems.org) e no [GenBank](https://www.ncbi.nlm.nih.gov/genbank/)? E
-quais espécies ainda **não têm nenhuma**? O recorte é de tetrápodes; peixes não entram.
+Para cada espécie de **planta vascular nativa do Brasil** (angiospermas, gimnospermas, samambaias e
+licófitas) na [Flora e Funga do Brasil](https://floradobrasil.jbrj.gov.br): quantas sequências de
+DNA públicas existem no [BOLD Systems](https://boldsystems.org) e no
+[GenBank](https://www.ncbi.nlm.nih.gov/genbank/)? E quais espécies ainda **não têm nenhuma**?
+Briófitas, algas e fungos não entram.
 
 **O que o painel mede.** Sequências de DNA **depositadas** no BOLD ou no GenBank, de qualquer
-marcador (COI, cyt b, 16S, RAG-1, mitogenoma...). Não é um levantamento de genomas nem de bases de
-referência para eDNA: uma espécie com uma única sequência de 16S conta como "com DNA", mesmo que não
-sirva para todo primer de eDNA. Leituras brutas de sequenciamento (SRA) não contam como sequência
+marcador (rbcL, matK, ITS, trnH-psbA, plastoma...). Não é um levantamento de genomas nem de bases de
+referência para eDNA: uma espécie com uma única sequência de ITS conta como "com DNA", mesmo que não
+sirva para todo estudo. Leituras brutas de sequenciamento (SRA) não contam como sequência
 depositada; elas aparecem só como uma marca, "só dados brutos" (ver abaixo).
 
 ```{ojs}
@@ -31,115 +32,127 @@ depositada; elas aparecem só como uma marca, "só dados brutos" (ver abaixo).
   const n = conta(cobertura);
   return md`Na última atualização (${status.atualizado_em}): **${fmtn(n.total)}** espécies,
 **${fmtn(n.com)}** com DNA público (${fmtpct(n.com / n.total)}), **${fmtn(n.sem)}** sem nenhum DNA
-encontrado e **${fmtn(n.verificar)}** a verificar. Das sem DNA e a verificar, **${fmtn(n.brutos)}** já
-têm leituras brutas no SRA.`;
+encontrado (${fmtpct(n.sem / n.total)}) e **${fmtn(n.verificar)}** a verificar. Das sem DNA e a
+verificar, **${fmtn(n.brutos)}** já têm leituras brutas no SRA.`;
 }
 ```
 
-## Listas de espécies
-
-Uma lista de referência por grupo, todas convertidas para o mesmo esquema de colunas.
+## Lista de espécies
 
 ```{ojs}
-md`| Grupo | Lista | Licença |
-|---|---|---|
-| Anfíbios | Drummond, L. O., Santana, D. J., Lima, L. M. C. & Toledo, L. F. (2026). *Lista de Anfíbios do Brasil*. Herpetologia Brasileira 15(2). [doi:10.5281/zenodo.18340087](https://doi.org/10.5281/zenodo.18340087). Dados estruturados do pacote [amphiBR](https://github.com/paulobarros/amphiBR) (P. Barros). UF, bioma, endemismo e as categorias DD/NT/LC vêm da lista anterior (Segalla et al. 2021, [doi:10.5281/zenodo.4716176](https://doi.org/10.5281/zenodo.4716176)) pelo nome de 2021; as espécies sem nome em 2021 recebem a UF do CTFB. | Listas CC-BY 4.0; pacote GPL ≥ 3 (só os dados são usados) |
-| Répteis | Entiauspe-Neto, O. M., Costa, H. C. & Guedes, T. B. [ReptiliaBR](https://github.com/omarentiauspe/ReptiliaBR) v0.4.0: lista e ocorrência por UF dos répteis do Brasil (SBH). Só ocorrências confirmadas ("X") entram no mapa. | MIT |
-| Aves | Pacheco, J. F. et al. (2021). *Annotated checklist of the birds of Brazil by the Brazilian Ornithological Records Committee*, 2ª ed. Ornithology Research 29: 94-105. Lista Primária. [doi:10.5281/zenodo.5138368](https://doi.org/10.5281/zenodo.5138368) | CC-BY 4.0 |
-| Mamíferos | Abreu, E. F. et al. *Lista de Mamíferos do Brasil* v2025-1. CT-SBMz. [doi:10.5281/zenodo.18378485](https://doi.org/10.5281/zenodo.18378485) | CC-BY 4.0 |
-
-Quando a lista registra o nome anterior de uma espécie (combinação antiga, sinônimo júnior), esse
-nome entra na busca de sequências junto com os sinônimos do CTFB e do GBIF: as 63 combinações novas
-da lista de anfíbios de 2026 (por exemplo, *Scinax agilis* → *Ololygon agilis*) não viram falsas
-órfãs. Espécies marinhas entram quando a
-lista do grupo as traz (tartarugas marinhas, aves marinhas, cetáceos, sirênios): nenhum filtro manual.`
+md`**Flora e Funga do Brasil** (Jardim Botânico do Rio de Janeiro), arquivo Darwin Core publicado no
+[IPT do JBRJ](https://ipt.jbrj.gov.br/jbrj/resource?r=lista_especies_flora_brasil) e no GBIF
+([doi:10.15468/1mtkaw](https://doi.org/10.15468/1mtkaw)), CC-BY 4.0. Versão usada: **${status.lista ?? "a mais recente"}**,
+baixada a cada atualização.`
 ```
+
+Entram as espécies **aceitas**, de plantas vasculares, com origem **nativa** no Brasil. Ficam de fora
+as cultivadas e naturalizadas, as espécies sem origem informada e os híbridos (nototáxons, como
+*Dyckia ×elisabethae*). **Variedades e subespécies somam na espécie:** os nomes infraespecíficos
+aceitos entram na busca de sequências da espécie.
+
+Da Flora e Funga vêm também a ocorrência por estado, os domínios fitogeográficos, o endemismo, a
+forma de vida, o substrato e, quando há, o ano de descrição. O que falta de ano de descrição vem do
+WCVP (abaixo).
+
+## Nomes buscados
+
+Uma espécie pode ter sequências sob muitos nomes. O painel busca todos os conhecidos, com regras para
+não somar sequências de outra planta:
+
+- **Sinônimos da Flora e Funga** (e os nomes infraespecíficos). É a referência: a sinonímia dela
+  prevalece.
+- **Sinônimos globais do WCVP** ([World Checklist of Vascular Plants](https://powo.science.kew.org),
+  Royal Botanic Gardens, Kew; Govaerts et al. 2021,
+  [doi:10.1038/s41597-021-00997-6](https://doi.org/10.1038/s41597-021-00997-6)), baixado direto da
+  Kew e refeito a cada 90 dias. Pegam transferências de gênero e nomes usados fora do Brasil.
+- **Saem da busca:** os nomes que a Flora e Funga atribui a outra espécie aceita; os **homônimos**
+  (o mesmo binômio é nome de mais de uma planta no WCVP, como *Vitis palmata*, sinônimo de *Cissus
+  palmata* e nome de uma uva norte-americana); e, quando o WCVP junta a espécie com outra que a Flora
+  e Funga aceita, todos os nomes do WCVP.
 
 ## Sequências
 
-- **BOLD Systems** (portal v5): uma consulta por classe ao endpoint público
-  `api/summary`, que devolve o número de registros públicos por nome de espécie; outra consulta
-  igual, restrita a material coletado no Brasil. Sem chave.
-- **GenBank** (NCBI E-utilities, `esearch` no banco `nuccore`): contagem de registros por
-  `"Gênero epíteto"[Organism]`. O filtro `[Organism]` usa a taxonomia do NCBI e já inclui os
-  sinônimos que o NCBI conhece. Os nomes anteriores dados pela lista e os sinônimos do CTFB entram
-  na mesma busca com `OR`.
-- **SRA** (NCBI E-utilities, `esearch` no banco `sra`): só para as espécies sem sequência montada,
-  pelo campo Organism, com o nome da lista e as combinações do mesmo epíteto. Sinônimos com outro
-  epíteto ficam de fora, para não contar dados de uma espécie-mãe desmembrada. Não muda a situação.
-- **Catálogo Taxonômico da Fauna do Brasil** ([CTFB/JBRJ](https://fauna.jbrj.gov.br), API REST
-  aberta): sinônimos, ocorrência por UF (usada para aves, e para anfíbios sem UF na lista),
-  endemismo e ano de descrição quando a lista não traz.
-- **GBIF Backbone** ([api.gbif.org](https://techdocs.gbif.org/en/openapi/v1/species)): para as
-  espécies sem DNA sob o nome da lista, o nome aceito no GBIF e os sinônimos dele (pega
-  transferências de gênero, como *Heterospizias meridionalis* / *Buteogallus meridionalis*). Se o
-  GBIF não reconhece o nome, nada é inventado: a espécie fica "a verificar".
-- **Categoria nacional de ameaça:** Portaria MMA nº 1.704, de 16/06/2026 (Lista Nacional Oficial
-  das Espécies da Fauna Ameaçadas de Extinção, Anexo I), extraída do PDF publicado no DOU. Espécie
-  com só subespécies listadas aparece como "categoria (ssp.)". Quando a espécie não consta da
-  portaria, mantêm-se as categorias DD/NT/LC das avaliações citadas pelas listas (MMA 2022 para
-  anfíbios, MMA 2023 para mamíferos).
+- **Taxonomia do NCBI** (`taxdump`, subárvore das plantas verdes, refeita toda semana): todo registro
+  do GenBank está ligado a um táxon dela. Só os nomes que a taxonomia do NCBI conhece vão para a
+  contagem; um nome que lá é de outra espécie da lista sai da busca. Para as espécies sem nenhum
+  nome no NCBI, o nome é procurado em texto livre no GenBank.
+- **GenBank** (NCBI E-utilities, `esearch` no banco `nuccore`): contagem de registros com todos os
+  nomes da espécie no campo `[Organism]`, unidos por `OR`. Conta-se à parte o que está sob o nome da
+  lista e outras combinações do mesmo epíteto, sob os sinônimos da Flora e Funga e sob os do WCVP.
+- **BOLD Systems** (portal v5): uma única consulta ao endpoint público `api/summary` para o filo
+  Tracheophyta devolve o número de registros públicos por nome de espécie; outra, igual, só com
+  material coletado no Brasil. Casamento pelo nome exato. Sem chave.
+- **SRA** (NCBI E-utilities, banco `sra`): só para as espécies sem sequência montada, pelo campo
+  Organism, com o nome da lista e as combinações do mesmo epíteto. Sinônimos com outro epíteto ficam
+  de fora, para não contar dados de uma espécie-mãe desmembrada. Não muda a situação.
+- **Categoria nacional de ameaça:** Portaria GM/MMA nº 1.783, de 26/10/2026 (Lista Nacional Oficial
+  das Espécies da Flora Ameaçadas de Extinção), pelo CSV do
+  [Portal de Dados Abertos do MMA](https://dados.mma.gov.br/dataset/especies-ameacadas). "(infra)"
+  marca a espécie com só variedades ou subespécies listadas; "(PE)", possivelmente extinta. A
+  portaria não traz as categorias DD, NT e LC.
 - Mapa: malha de UFs do [IBGE](https://servicodados.ibge.gov.br/api/docs/malhas) (qualidade mínima).
 
 ## Situação de cada espécie
 
 | Situação | Critério |
 |---|---|
-| **com DNA** | ao menos um registro no BOLD ou no GenBank **sob o nome da lista** ou sob outra combinação do **mesmo epíteto** (transferência de gênero; a observação diz qual) |
-| **a verificar** | sem DNA sob o nome da lista, mas: há sequências só sob nome alternativo com outro epíteto (sinônimo, nome aceito no CTFB ou no GBIF; pode ser desmembramento ou agrupamento de espécies); ou o nome não está no CTFB ou não é reconhecido pelo GBIF (não deu para conferir sinônimos); ou o nome da lista é sinônimo no CTFB; ou o nome aparece no GenBank fora do campo Organism (nota, subespécie, identificação antiga); ou o gênero tem 500 registros ou mais no GenBank |
-| **sem DNA** | nenhuma sequência depositada sob o nome e os sinônimos conhecidos, e nenhum dos sinais acima |
+| **com DNA** | ao menos um registro no BOLD ou no GenBank **sob o nome da lista**, sob outra combinação do **mesmo epíteto** (transferência de gênero, variedade ou subespécie; a terminação pode mudar, como *ctenophylla*/*ctenophyllum*) ou sob um **sinônimo da Flora e Funga** (a observação diz qual) |
+| **a verificar** | sem DNA sob esses nomes, mas há sequências sob um **sinônimo do WCVP**. O WCVP às vezes trata a espécie num conceito mais amplo, e as sequências podem ser de outra população ou de outra espécie do complexo; só olhando os vouchers dá para saber |
+| **sem DNA** | nenhuma sequência depositada sob o nome e os sinônimos conhecidos |
 
 **Só dados brutos** é uma marca, não uma situação. Vai nas espécies "sem DNA" ou "a verificar" que
-têm leituras de sequenciamento públicas no SRA (captura de UCE, ddRAD, RNA-Seq, genoma) e nenhuma
+têm leituras de sequenciamento públicas no SRA (genoma, transcriptoma, captura de alvos) e nenhuma
 sequência montada no BOLD ou no GenBank. Elas seguem na lacuna, mas quem for adotar pode começar
 montando o que já existe.
 
-**Ter sinônimos não é motivo para "a verificar".** Todos os sinônimos conhecidos (da lista, do CTFB
-e do GBIF) entram na busca do BOLD e do GenBank. Se nenhum deles tem sequência, a espécie é "sem
-DNA", e a observação lista os sinônimos buscados para quem quiser conferir. Até a atualização de
-2026-10-30, ter sinônimos bastava para "a verificar". Com a mudança, 91 espécies passaram para "sem
-DNA" (45 répteis, 22 aves, 14 anfíbios e 10 mamíferos), e o histórico dessa data foi recalculado
-com a regra nova. As datas anteriores no `data/historico.csv` seguem a regra antiga.
+**Notas que não mudam a situação.** A coluna "Observação" lista os nomes buscados e avisa quando: o
+nome não está no WCVP (só os sinônimos da Flora e Funga foram buscados); nenhum dos nomes está na
+taxonomia do NCBI; o nome aparece no GenBank fora do campo Organism (em geral como hospedeiro de
+fungo, bactéria ou vírus); o gênero tem 500 registros ou mais no GenBank; ou há registros do gênero
+coletados no Brasil sem identificação até espécie no BOLD.
 
 **Cuidado com a "falsa órfã".** Uma espécie pode parecer sem DNA porque o banco usa um nome antigo,
 um nome com erro ou uma identificação só até gênero ("*Gênero* sp."). Por isso o painel nunca afirma
-"não existe DNA": afirma que **não foi encontrado sob os nomes conferidos**. A coluna "Observação"
-diz o motivo de cada "a verificar" e quantos registros do gênero coletados no Brasil estão sem
-identificação no BOLD. Achou uma sequência que o painel não viu? Abra uma issue com o link.
+"não existe DNA": afirma que **não foi encontrado sob os nomes conferidos**. Achou uma sequência que
+o painel não viu? [Abra uma correção](https://github.com/rsilveirafh/traqueophyDNA/issues/new?labels=correcao)
+com o link.
 
 Faixas de registros no BOLD seguem o [iBOL Europe Gap List](https://species.iboleurope.org):
 0 / 1-2 / 3-9 / 10 ou mais. A ideia de ranquear lacunas vem de lá.
 
 ## Validação
 
-Para medir o erro, sorteamos 120 espécies dos dados de 2026-10-30 (50 sem DNA, 50 a verificar e 20
-com DNA, proporcionais ao tamanho de cada grupo) e conferimos cada uma por caminhos diferentes dos
-do pipeline: taxonomia do NCBI, busca pelo taxid, texto livre do GenBank, o epíteto em gêneros
-antigos, o SRA e os nomes parecidos no BOLD.
+Para medir o erro, sorteamos 120 espécies dos dados de 2026-11-05 (50 sem DNA, 50 a verificar e 20
+com DNA, proporcionais ao tamanho de cada grupo) e conferimos cada uma por caminhos diferentes dos do
+pipeline: taxonomia do NCBI, busca pelo taxid, texto livre do GenBank, o epíteto em gêneros antigos,
+o SRA, o BioSample e os nomes parecidos no BOLD.
 
-- **Nenhuma falsa órfã** entre as 50 sem DNA e **nenhum falso positivo** entre as 20 com DNA, para
-  sequências depositadas.
-- **14 das 50 sem DNA tinham leituras brutas no SRA.** Foi isso que levou à marca "só dados brutos".
-- **Das 50 a verificar, 37 eram sem DNA,** 6 tinham DNA sob um gênero antigo ou nome trinomial que
-  nenhuma fonte de sinônimos conhecia, 4 só dados brutos e 3 eram desmembramentos de fato duvidosos.
-  O alerta "nome não reconhecido no GBIF" achou 5 das 6; "gênero muito sequenciado", sozinho,
-  nenhuma.
+- **Nenhuma falsa órfã** entre as 50 sem DNA (IC 95%: 0–7%) e **nenhum falso positivo** entre as 20
+  com DNA.
+- **Das 50 "a verificar", 40 eram sem DNA, 8 com DNA e 2 seguiam duvidosas.** As sem DNA eram, na
+  maioria, sequências de outra espécie que o WCVP junta com a da lista, homônimos e nomes citados só
+  como hospedeiro. As com DNA estavam sob sinônimos da Flora e Funga, grafias variantes ou um táxon
+  novo no NCBI.
+- Essas regras entraram no pipeline em 2026-11-05: as "a verificar" caíram de 1.349 para 75, e 17
+  espécies que contavam como "com DNA" por um homônimo passaram para "sem DNA". Na amostra, o painel
+  agora concorda com a conferência em 115 das 120 espécies.
 
 A conferência foi assistida por IA e está passando por auditoria humana. Método, planilhas e
 scripts em [`validacao/`](https://github.com/rsilveirafh/traqueophyDNA/tree/main/validacao).
 
 ## Atualização
 
-Um robô (GitHub Actions) roda toda semana: baixa as listas, consulta CTFB, BOLD, GenBank e SRA e grava
-os resultados em CSV no repositório. O histórico do git é o histórico dos dados. A consulta ao
-GenBank é incremental: espécies novas e as sem DNA são reconsultadas toda semana; as demais, a cada
-4 semanas.
+Um robô (GitHub Actions) roda toda semana: baixa a Flora e Funga e a taxonomia do NCBI, consulta o
+BOLD, o GenBank e o SRA e grava os resultados em CSV no repositório. O histórico do git é o histórico
+dos dados. A consulta ao GenBank é incremental: as espécies sem DNA são reconsultadas toda semana; as
+com DNA, a cada 4 semanas.
 
 ## Imagens
 
-- **Silhuetas** dos grupos: [PhyloPic](https://www.phylopic.org). *Rhinella marina* (Dennis C. Murphy),
-  *Tropidurus itambere* (Heitor Campos de Sousa) e *Myrmecophaga tridactyla* (Steven Traver), CC0 1.0;
-  *Pitangus sulphuratus* (Kai Caspar), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+- **Silhuetas** dos grupos: [PhyloPic](https://www.phylopic.org). *Xylopia polyantha* (Ferran Sayol)
+  e *Polypodium vulgare*, CC0 1.0; *Araucaria angustifolia* (LeonardoG e T. Michael Keesey),
+  [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/).
 - **Fotos** das espécies: foto padrão do táxon no [iNaturalist](https://www.inaturalist.org), só
   quando tem licença Creative Commons. O autor e a licença aparecem em cada foto.
 
@@ -151,5 +164,5 @@ GenBank é incremental: espécies novas e as sem DNA são reconsultadas toda sem
 
 ```{ojs}
 md`Código e dados no [GitHub](${REPO}). Código sob licença MIT; tabelas derivadas sob CC-BY 4.0
-(cite as listas originais e este painel).`
+(cite a Flora e Funga do Brasil, o WCVP e este painel).`
 ```

@@ -13,7 +13,7 @@ format:
 
 # Onde estão as espécies sem DNA
 
-[Uma espécie entra em todos os estados onde ocorre. Ocorrência por UF: listas de anfíbios (amphiBR, pelo nome de 2021; espécies novas pelo CTFB), répteis (ReptiliaBR) e mamíferos (SBMz); para aves, o CTFB. ${fmtn(sem_uf)} espécies do recorte não têm UF em nenhuma fonte e ficam fora do mapa.]{.cc-intro}
+[Uma espécie entra em todos os estados onde ocorre. Ocorrência por UF: Flora e Funga do Brasil. ${fmtn(sem_uf)} espécies do recorte não têm UF em nenhuma fonte e ficam fora do mapa.]{.cc-intro}
 :::
 
 ::: {.cc-filtros}
@@ -148,25 +148,17 @@ clique para ver a lista`}),
 {
   if (uf_sel) {
     const d = por_uf.find(x => x.uf === uf_sel);
-    const lista = sel.filter(x => x.ufs_lista.includes(uf_sel) && eh_sem(x))
-      .sort((a, b) => d3.ascending(a.situacao === "sem DNA" ? 0 : 1, b.situacao === "sem DNA" ? 0 : 1) ||
-                      d3.ascending(a.prioridade, b.prioridade) ||
-                      d3.ascending(a.ano_descricao ?? 9999, b.ano_descricao ?? 9999) ||
-                      d3.ascending(a.especie, b.especie));
+    const lista = sel.filter(x => x.ufs_lista.includes(uf_sel) && eh_sem(x)).sort(ordena_prioridade);
     const voltar = htl.html`<button class="cc-cta cc-pequeno" type="button">← Ranking</button>`;
     voltar.onclick = () => escolhe_uf(null);
-    const ameaca = c => c && AMEACADAS.has(c) || c === "DD" ? htl.html`<span class="cc-chip cc-${c.toLowerCase()}">${c}</span>` : "";
     return htl.html`<div class="cc-uf-painel">
       <div class="cc-uf-topo"><span class="cc-chapeu">${grupo === "Todos" ? "Plantas vasculares" : grupo} · ${com_verificar.length ? "sem DNA e a verificar" : "sem DNA"}</span>${voltar}</div>
       <h3>${d.nome}</h3>
       <p class="cc-uf-resumo"><b>${fmtn(lista.length)}</b> de ${fmtn(d.total)} espécies registradas no estado${
         com_verificar.length ? "" : htl.html`; outras ${fmtn(d.verificar)} estão a verificar (marque "somar a verificar" para listá-las)`}.</p>
-      ${lista.length ? htl.html`<ul class="cc-uf-especies">${lista.map(x => htl.html`<li>
-        <a href="${link_adote(x.especie)}" target="_blank" title="Adotar esta espécie"><em>${x.especie}</em></a>
-        <span class="cc-uf-chips">${com_verificar.length ? selo_situacao(x.situacao) : ""}${selo_brutos(x)}${ameaca(x.categoria_ameaca)}${x.endemica ? htl.html`<span class="cc-chip">endêmica</span>` : ""}</span>
-        <small>${x.grupo_rotulo} · ${x.familia}${x.ano_descricao ? ` · ${x.ano_descricao}` : ""}</small>
-      </li>`)}</ul>` : htl.html`<p>Nenhuma espécie com estes filtros.</p>`}
-      <p class="nota-pequena">Clique no nome para adotar. Para filtrar por família ou buscar, use <a href="especies.html">Espécies sem DNA</a>.</p>
+      ${lista.length ? htl.html`<ul class="cc-uf-especies">${lista.slice(0, 500).map(x => item_especie(x, com_verificar.length > 0))}</ul>
+      ${lista.length > 500 ? htl.html`<p class="nota-pequena">Mostrando as 500 primeiras, por prioridade.</p>` : ""}` : htl.html`<p>Nenhuma espécie com estes filtros.</p>`}
+      <p class="nota-pequena">Clique no nome para adotar. Para ver todas, filtrar por família ou buscar, use <a href="especies.html">Espécies sem DNA</a>.</p>
     </div>`;
   }
   const linhas = por_uf.slice().sort((a, b) => d3.descending(valor(a), valor(b)));

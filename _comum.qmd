@@ -1,7 +1,8 @@
 ```{ojs}
 //| output: false
 // Dados e utilidades compartilhados por todas as páginas (incluído com {{< include >}}).
-cobertura_bruta = FileAttachment("data/cobertura.csv").csv({typed: true})
+// data/site.csv é a versão enxuta de data/cobertura.csv (ver grava_site() em R/junta.R).
+cobertura_bruta = FileAttachment("data/site.csv").csv({typed: true})
 adocoes = FileAttachment("data/adocoes.csv").csv({typed: true})
 status = FileAttachment("data/status.json").json()
 
@@ -14,33 +15,47 @@ ROTULO_GRUPO = new Map([
 OPCOES_GRUPO = ["Todos", ...ROTULO_GRUPO.values()]
 GRUPO_POR_ROTULO = new Map([...ROTULO_GRUPO].map(([k, v]) => [v, k]))
 
+// Domínios fitogeográficos da Flora e Funga, do maior para o menor número de espécies.
+DOMINIOS = ["Mata Atlântica", "Amazônia", "Cerrado", "Caatinga", "Pampa", "Pantanal"]
+FORMAS_VIDA = ["Árvore", "Arbusto", "Subarbusto", "Erva", "Liana/volúvel/trepadeira", "Palmeira",
+               "Bambu", "Suculenta", "Dracenóide"]
+SUBSTRATOS = ["Terrícola", "Rupícola", "Epífita", "Hemiepífita", "Aquática", "Parasita",
+              "Hemiparasita", "Saprófita"]
+
 // Cores de situação (as mesmas de tema-claro.scss; tons médios que funcionam
 // no claro e no escuro): sálvia / ocre / terracota. E uma cor por grupo.
 SITUACOES = ["com DNA", "a verificar", "sem DNA"]
 COR_SITUACAO = ["#8fae8f", "#d6a23a", "#c4633a"]
-COR_GRUPO = ["#2f6b4f", "#b8532c", "#c99a2e", "#5b6f8a"]
+COR_GRUPO = ["#2f6b4f", "#b8532c", "#5b6f8a"]
 
+// Portaria MMA 1.783/2026: CR, EN e VU (com "(infra)" quando só há infraespecíficos
+// listados e "(PE)" para possivelmente extinta).
+eh_ameacada = c => /^(CR|EN|VU)/.test(c ?? "")
 AMEACADAS = new Set(["CR", "EN", "VU"])
+
+lista_de = v => v ? String(v).split(";") : []
 
 cobertura = {
   const adot = new Map(adocoes.map(a => [a.especie, a]));
   return cobertura_bruta.map(d => {
     const a = adot.get(d.especie);
-    const ufs = d.ufs ? String(d.ufs).split(";") : [];
     const cat = d.categoria_ameaca ?? "";
+    const endemica = d.endemica_br === true || d.endemica_br === "TRUE";
     return {
       ...d,
       grupo_rotulo: ROTULO_GRUPO.get(d.grupo),
-      ufs_lista: ufs,
-      endemica: d.endemica_br === true || d.endemica_br === "TRUE",
-      ameacada: AMEACADAS.has(cat),
+      ufs_lista: lista_de(d.ufs),
+      biomas_lista: lista_de(d.biomas),
+      formas_lista: lista_de(d.forma_vida),
+      substratos_lista: lista_de(d.substrato),
+      endemica,
+      ameacada: eh_ameacada(cat),
       // leituras brutas no SRA, sem sequência montada (marca, não é situação)
       brutos: d.dados_brutos === true || d.dados_brutos === "TRUE",
       adocao: a ? a.situacao : null,
       adotada_por: a ? a.instituicao : null,
-      // prioridade: ameaçada > DD > endêmica > descrita há mais tempo
-      prioridade: (AMEACADAS.has(cat) ? 0 : cat === "DD" ? 1 : 2) * 10 +
-                  (d.endemica_br === true || d.endemica_br === "TRUE" ? 0 : 1)
+      // prioridade: ameaçada > endêmica > descrita há mais tempo (a portaria não traz DD)
+      prioridade: (eh_ameacada(cat) ? 0 : 1) * 10 + (endemica ? 0 : 1)
     };
   });
 }
@@ -63,11 +78,18 @@ conta = dados => {
   };
 }
 
+// Observação completa: nas "sem DNA", site.csv omite a frase padrão.
+observacao = d => d.situacao === "sem DNA"
+  ? "Nada encontrado no BOLD ou no GenBank sob este nome e os sinônimos conhecidos" + (d.observacao ? `; ${d.observacao}` : "") + "."
+  : (d.observacao ?? "")
+
 link_adote = especie =>
   `${REPO}/issues/new?template=adote.yml&title=${encodeURIComponent("Adoção: " + especie)}&especie=${encodeURIComponent(especie)}`
 
 link_sra = especie =>
   `https://www.ncbi.nlm.nih.gov/sra/?term=${encodeURIComponent('"' + especie + '"[Organism]')}`
+
+link_ffb = id => id ? `https://floradobrasil.jbrj.gov.br/FB${id}` : null
 
 // Marca das espécies sem sequência montada que têm leituras brutas no SRA.
 selo_brutos = d => d.brutos
@@ -79,4 +101,22 @@ selo_situacao = s => {
   const ico = s === "com DNA" ? "✓" : s === "sem DNA" ? "✕" : "?";
   return htl.html`<span class="situacao ${cls}">${ico} ${s}</span>`;
 }
+
+cor_ameaca = c => c?.startsWith("CR") ? "cr" : c?.startsWith("EN") ? "en" : c?.startsWith("VU") ? "vu" : "outra"
+
+selo_ameaca = c => eh_ameacada(c)
+  ? htl.html`<span class="cc-chip cc-${cor_ameaca(c)}" title="Portaria MMA 1.783/2026">${c}</span>` : ""
+
+// Lista curta de espécies (painéis de estado e de domínio).
+item_especie = (x, com_situacao) => htl.html`<li>
+  <a href="${link_adote(x.especie)}" target="_blank" title="Adotar esta espécie"><em>${x.especie}</em></a>
+  <span class="cc-uf-chips">${com_situacao ? selo_situacao(x.situacao) : ""}${selo_brutos(x)}${selo_ameaca(x.categoria_ameaca)}${x.endemica ? htl.html`<span class="cc-chip">endêmica</span>` : ""}</span>
+  <small>${x.grupo_rotulo} · ${x.familia}${x.ano_descricao ? ` · ${x.ano_descricao}` : ""}</small>
+</li>`
+
+ordena_prioridade = (a, b) =>
+  d3.ascending(a.situacao === "sem DNA" ? 0 : 1, b.situacao === "sem DNA" ? 0 : 1) ||
+  d3.ascending(a.prioridade, b.prioridade) ||
+  d3.ascending(a.ano_descricao ?? 9999, b.ano_descricao ?? 9999) ||
+  d3.ascending(a.especie, b.especie)
 ```

@@ -31,6 +31,12 @@ $border-radius: .5rem;
 }
 .navbar-brand { font-family: $headings-font-family; font-weight: 600; letter-spacing: .01em; }
 .navbar-brand img { height: 26px; }
+// "traqueophyDNA" é longo: no celular o título encolhe em vez de ser cortado.
+@media (max-width: 576px) {
+  .navbar-brand { min-width: 0; }
+  .navbar-brand .navbar-title { font-size: .95rem; letter-spacing: 0; overflow: visible; text-overflow: clip; }
+  .navbar-brand img { height: 20px; }
+}
 h1, h2, h3 { letter-spacing: -.01em; }
 .cc-num, table td, .value-box-value { font-variant-numeric: tabular-nums lining-nums; }
 
@@ -67,7 +73,7 @@ h1, h2, h3 { letter-spacing: -.01em; }
 .cc-capa .cc-logo { width: 120px; height: auto; margin-bottom: 1.25rem; }
 // Logo da capa: versão tinta no tema claro, versão papel no escuro.
 body.quarto-light .cc-so-escuro, body.quarto-dark .cc-so-claro { display: none; }
-.cc-capa h1 { font-size: clamp(2.6rem, 6vw, 4.2rem); font-weight: 700; margin: 0 0 .5rem; }
+.cc-capa h1 { font-size: clamp(2.2rem, 10vw, 4.2rem); font-weight: 700; margin: 0 0 .5rem; overflow-wrap: anywhere; }
 .cc-capa .cc-lede { font-size: clamp(1.15rem, 2.2vw, 1.4rem); max-width: 38rem; margin: 0 auto;
   color: $cc-apagado; }
 .cc-capa .cc-lede strong { color: $cc-tinta; }
@@ -110,8 +116,22 @@ body.quarto-light .cc-so-escuro, body.quarto-dark .cc-so-claro { display: none; 
   margin-right: .4em; vertical-align: -.05em; background: var(--cor); }
 
 // Cartões dos grupos, com silhueta (PhyloPic) pintada pela cor do texto.
-.cc-grupos { display: grid; grid-template-columns: repeat(4, 1fr); gap: .9rem; }
-@media (max-width: 768px) { .cc-grupos { grid-template-columns: repeat(2, 1fr); } }
+.cc-grupos { display: grid; grid-template-columns: repeat(3, 1fr); gap: .9rem; }
+@media (max-width: 640px) { .cc-grupos { grid-template-columns: 1fr; } }
+// Por domínio: seis cartões em duas colunas, ao lado do painel.
+.cc-grupos.cc-dominios { grid-template-columns: repeat(2, 1fr); }
+@media (max-width: 420px) { .cc-grupos.cc-dominios { grid-template-columns: 1fr; } }
+.cc-grupo.cc-ativo { border-color: $cc-mata; box-shadow: 0 0 0 1px $cc-mata; }
+.cc-secao h4.cc-chapeu { margin: 1.4rem 0 .3rem; }
+
+// Mosaico da capa (canvas) e a dica que segue o ponteiro.
+.cc-mosaico { position: relative; line-height: 0; touch-action: pan-y; }
+.cc-mosaico canvas { display: block; cursor: crosshair; }
+.cc-mosaico-dica { position: absolute; z-index: 3; pointer-events: none; line-height: 1.35; white-space: nowrap;
+  padding: .4rem .6rem; border-radius: .45rem; background: $cc-cartao; border: 1px solid $cc-regua;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .12); font-family: $font-family-sans-serif; font-size: .82rem; }
+.cc-mosaico-dica em { display: block; font-family: $headings-font-family; font-size: .95rem; }
+.cc-mosaico-dica small { display: block; color: $cc-apagado; margin-bottom: .2rem; }
 .cc-grupo { background: $cc-cartao; border: 1px solid $cc-regua; border-radius: .75rem; padding: 1rem 1rem .9rem;
   display: flex; flex-direction: column; gap: .35rem; transition: border-color .15s ease, transform .15s ease; }
 .cc-grupo:hover { border-color: $cc-mata; transform: translateY(-2px); }

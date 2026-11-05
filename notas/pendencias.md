@@ -167,9 +167,20 @@ de regra, não DNA novo: `eventos.csv` voltou a ter só o cabeçalho. Detalhes e
 Corrigido nos testes: o SRA e as fotos do iNaturalist só rodam para espécies já consultadas no
 GenBank; os eventos ("ganhou DNA") só contam quem já tinha sido consultado antes.
 
-## F4: lembrar
+## F4: site (2026-11-05)
 
-- `data/cobertura.csv` tem ~12 MB com 35 mil espécies: pesado para o site no celular. Avaliar
-  uma versão enxuta para o navegador (colunas do site, ou só as não "com DNA" com detalhe).
-- `index.qmd` e `sobre.qmd` ainda têm silhuetas e textos do tetrapoDNA (classes, "uma consulta
-  por classe" ao BOLD).
+- [x] **Dados enxutos para o site:** `data/site.csv` (`grava_site()` em `R/junta.R`, gravado a cada
+      atualização): 19 colunas, sem a frase padrão das "sem DNA". 7,3 MB (1 MB com gzip, que o
+      GitHub Pages aplica) contra 13 MB do `cobertura.csv`, que segue para download.
+- [x] Textos de todas as páginas para plantas (Flora e Funga, WCVP, taxonomia do NCBI, Portaria
+      1.783/2026, validação de plantas); silhuetas do PhyloPic (*Xylopia*, *Araucaria*,
+      *Polypodium*; créditos em `assets/silhuetas/CREDITOS.md`).
+- [x] Capa: mosaico em canvas (35 mil quadradinhos em SVG pesariam), três cartões de grupo,
+      domínios fitogeográficos e a fração da família na lacuna.
+- [x] **Por domínio** (`dominios.qmd`): seis cartões clicáveis, exclusivas do domínio, lista por
+      prioridade e a lacuna por forma de vida e substrato.
+- [x] Espécies sem DNA: filtros de domínio e forma de vida, link para a ficha na Flora e Funga.
+      Ameaça por prefixo ("CR (infra)", "CR (PE)" contam como ameaçadas).
+- [x] Conferido no Edge headless (desktop e iframes de 375 px).
+- [ ] O que o roteiro pede e ficou para depois: link que guarda os filtros (pendência do
+      tetrapoDNA também).

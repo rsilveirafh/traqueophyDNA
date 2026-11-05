@@ -7,10 +7,12 @@ project:
     - index.qmd
     - especies.qmd
     - estados.qmd
+    - dominios.qmd
     - adote.qmd
     - sobre.qmd
     - autor.qmd
   resources:
+    - data/site.csv
     - data/cobertura.csv
     - data/historico.csv
     - data/eventos.csv
@@ -33,16 +35,16 @@ website:
     logo: assets/logo.svg
     logo-alt: "traqueophyDNA"
     left:
-      - href: index.qmd
-        text: Visão geral
       - href: especies.qmd
         text: Espécies sem DNA
       - href: estados.qmd
         text: Por estado
+      - href: dominios.qmd
+        text: Por domínio
       - href: adote.qmd
-        text: Adote uma espécie
+        text: Adote
       - href: sobre.qmd
-        text: Fontes e método
+        text: Método
       - href: autor.qmd
         text: Quem faz
     right:

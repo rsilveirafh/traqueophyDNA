@@ -94,6 +94,7 @@ cob_antiga <- ler_csv("data/cobertura.csv", col_types = cols(.default = col_char
 cob <- monta_cobertura(especies, bold_cob, genbank, generos, sra, nomes_ncbi)
 atualiza_eventos(cob, cob_antiga)
 gravar_csv(cob, "data/cobertura.csv")
+grava_site(cob)
 atualiza_historico(cob)
 
 # 8. Fotos (iNaturalist) das espécies que não estão "com DNA" -----------------------
@@ -110,6 +111,7 @@ if (pendentes > 0) avisos <- c(avisos, paste0("GenBank: ", pendentes, " espécie
 status <- list(
   atualizado_em = hoje(),
   especies = nrow(cob),
+  lista = cob$versao_lista[1],
   genbank_pendentes = pendentes,
   ncbi_chave = nzchar(ncbi_chave()),
   avisos = as.list(avisos)

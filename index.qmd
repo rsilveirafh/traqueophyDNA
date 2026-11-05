@@ -18,7 +18,7 @@ pct = v => fmtpct(v / n.total)
 
 # traqueophyDNA
 
-[Quais anfíbios, répteis, aves e mamíferos do Brasil ainda não têm **nenhuma** sequência de DNA pública? Hoje são **${fmtn(n.sem)} espécies**, e outras ${fmtn(n.verificar)} precisam ter o nome conferido.]{.cc-lede}
+[Quais plantas nativas do Brasil (angiospermas, gimnospermas, samambaias e licófitas) ainda não têm **nenhuma** sequência de DNA pública? Hoje são **${fmtn(n.sem)} espécies**, ${pct(n.sem)} da flora vascular do país.]{.cc-lede}
 
 ::: {.cc-ctas}
 [Ver espécies sem DNA](especies.qmd){.cc-cta .cc-principal}
@@ -30,10 +30,10 @@ pct = v => fmtpct(v / n.total)
 
 ```{ojs}
 htl.html`<div class="cc-numeros">
-  <div><span class="cc-num">${fmtn(n.total)}</span><span class="cc-rotulo">espécies nas listas</span></div>
+  <div><span class="cc-num">${fmtn(n.total)}</span><span class="cc-rotulo">espécies nativas na Flora e Funga do Brasil</span></div>
   <div><span class="cc-num">${fmtn(n.com)}</span><span class="cc-rotulo"><b>${pct(n.com)}</b> com DNA público</span></div>
-  <div><span class="cc-num">${fmtn(n.verificar)}</span><span class="cc-rotulo"><b>${pct(n.verificar)}</b> a verificar</span></div>
   <div class="cc-sem"><span class="cc-num">${fmtn(n.sem)}</span><span class="cc-rotulo"><b>${pct(n.sem)}</b> sem nenhum DNA</span></div>
+  <div><span class="cc-num">${fmtn(n.verificar)}</span><span class="cc-rotulo">a verificar</span></div>
 </div>`
 ```
 
@@ -50,7 +50,7 @@ htl.html`<p class="nota-pequena">Das ${fmtn(n.sem + n.verificar)} espécies sem 
 
 ## Cada quadradinho é uma espécie
 
-[As ${fmtn(n.total)} espécies das listas oficiais das sociedades científicas, de anfíbios a mamíferos. Passe o mouse para ver o nome.]{.cc-intro}
+[As ${fmtn(n.total)} espécies de plantas vasculares nativas do Brasil. Passe o mouse (ou toque) para ver o nome.]{.cc-intro}
 
 ```{ojs}
 htl.html`<div class="cc-legenda">${SITUACOES.map((s, i) =>
@@ -59,54 +59,69 @@ htl.html`<div class="cc-legenda">${SITUACOES.map((s, i) =>
 
 ```{ojs}
 {
+  // Canvas em vez de SVG: são 35 mil quadradinhos.
   const ordem = new Map(SITUACOES.map((s, i) => [s, i]));
   const grupos = [...ROTULO_GRUPO.keys()];
   const dados = [...cobertura].sort((a, b) =>
     d3.ascending(ordem.get(a.situacao), ordem.get(b.situacao)) ||
     d3.ascending(grupos.indexOf(a.grupo), grupos.indexOf(b.grupo)) ||
-    d3.ascending(a.especie, b.especie));
-  const cols = width < 640 ? 50 : 100;
-  const linhas = Math.ceil(dados.length / cols);
+    d3.ascending(a.familia, b.familia) || d3.ascending(a.especie, b.especie));
+  const cols = width < 640 ? 100 : 200;
   const lado = width / cols;
-  return Plot.plot({
-    width, height: Math.ceil(linhas * lado), margin: 0, padding: 0.14,
-    x: {axis: null, domain: d3.range(cols)},
-    y: {axis: null, domain: d3.range(linhas)},
-    color: {domain: SITUACOES, range: COR_SITUACAO},
-    marks: [
-      Plot.cell(dados.map((d, i) => ({...d, col: i % cols, lin: Math.floor(i / cols)})), {
-        x: "col", y: "lin", fill: "situacao", rx: 1.5,
-        tip: {fontFamily: "Inter, sans-serif"},
-        title: d => `${d.especie}\n${d.grupo_rotulo} · ${d.familia}\n${d.situacao}`
-      })
-    ]
+  const linhas = Math.ceil(dados.length / cols);
+  const altura = Math.ceil(linhas * lado);
+  const dpr = window.devicePixelRatio || 1;
+  const canvas = htl.html`<canvas role="img" aria-label="Mosaico das espécies por situação" style="width:${width}px;height:${altura}px"></canvas>`;
+  canvas.width = Math.round(width * dpr);
+  canvas.height = Math.round(altura * dpr);
+  const ctx = canvas.getContext("2d");
+  ctx.scale(dpr, dpr);
+  const cor = new Map(SITUACOES.map((s, i) => [s, COR_SITUACAO[i]]));
+  const vao = Math.min(1, lado * 0.15);
+  dados.forEach((d, i) => {
+    ctx.fillStyle = cor.get(d.situacao);
+    ctx.fillRect((i % cols) * lado, Math.floor(i / cols) * lado, lado - vao, lado - vao);
   });
+  const dica = htl.html`<div class="cc-mosaico-dica" hidden></div>`;
+  const mostra = e => {
+    const r = canvas.getBoundingClientRect();
+    const x = e.clientX - r.left, y = e.clientY - r.top;
+    const d = dados[Math.floor(y / lado) * cols + Math.floor(x / lado)];
+    if (!d || x < 0 || x >= r.width) { dica.hidden = true; return; }
+    dica.replaceChildren(htl.html`<em>${d.especie}</em><small>${d.grupo_rotulo} · ${d.familia}</small>${selo_situacao(d.situacao)}`);
+    dica.hidden = false;
+    dica.style.left = `${Math.min(x + 12, r.width - dica.offsetWidth - 4)}px`;
+    dica.style.top = `${y + 14}px`;
+  };
+  canvas.addEventListener("pointermove", mostra);
+  canvas.addEventListener("pointerdown", mostra);
+  canvas.addEventListener("pointerleave", () => { dica.hidden = true; });
+  return htl.html`<div class="cc-mosaico">${canvas}${dica}</div>`;
 }
 ```
 
-[**Com DNA**: ao menos um registro público no BOLD ou no GenBank sob o nome da lista (ou sob uma combinação antiga do mesmo epíteto). **A verificar**: aparece sem DNA, mas há motivo para desconfiar do nome (DNA só sob outro nome, nome ausente do CTFB ou do GBIF, gênero muito sequenciado). **Sem DNA**: nada encontrado sob o nome e os sinônimos conhecidos. O painel conta sequências de DNA depositadas, de qualquer marcador; não é um levantamento de genomas nem de bases de referência para eDNA. Detalhes em [Fontes e método](sobre.qmd).]{.nota-pequena}
+[**Com DNA**: ao menos um registro público no BOLD ou no GenBank sob o nome da lista, sob outra combinação do mesmo epíteto (inclusive variedades e subespécies) ou sob um sinônimo da Flora e Funga. **A verificar**: o DNA está só sob um sinônimo do WCVP, que pode ser um conceito mais amplo da espécie. **Sem DNA**: nada encontrado sob o nome e os sinônimos conhecidos. O painel conta sequências de DNA depositadas, de qualquer marcador; não é um levantamento de genomas nem de bases de referência para eDNA. Detalhes em [Fontes e método](sobre.qmd).]{.nota-pequena}
 :::
 
 ::: {.cc-secao}
 [Por grupo]{.cc-chapeu}
 
-## Quatro listas, quatro lacunas
+## Três grupos, três lacunas
 
 ```{ojs}
 {
-  const img = {anfibios: "anfibios", repteis: "repteis", aves: "aves", mamiferos: "mamiferos"};
   const cartoes = [...ROTULO_GRUPO].map(([g, rot]) => {
     const c = conta(cobertura.filter(d => d.grupo === g));
     const barra = [["com", c.com], ["verificar", c.verificar], ["sem", c.sem]].map(([k, v], i) =>
       htl.html`<i style="width:${100 * v / c.total}%;background:${COR_SITUACAO[i]}"></i>`);
     return htl.html`<a class="cc-grupo" href="especies.html" style="color:inherit;text-decoration:none">
-      <div class="cc-silhueta" role="img" aria-label="${rot}" style="mask-image:url(assets/silhuetas/${img[g]}.svg);-webkit-mask-image:url(assets/silhuetas/${img[g]}.svg)"></div>
+      <div class="cc-silhueta" role="img" aria-label="${rot}" style="mask-image:url(assets/silhuetas/${g}.svg);-webkit-mask-image:url(assets/silhuetas/${g}.svg)"></div>
       <h3>${rot}</h3>
       <span class="cc-total">${fmtn(c.total)} espécies</span>
       <div class="cc-barra">${barra}</div>
       <span class="cc-linha"><span>com DNA</span><b>${fmtpct(c.com / c.total)}</b></span>
-      <span class="cc-linha"><span>a verificar</span><b>${fmtn(c.verificar)}</b></span>
       <span class="cc-linha cc-sem"><span>sem DNA</span><b>${fmtn(c.sem)}</b></span>
+      <span class="cc-linha"><span>a verificar</span><b>${fmtn(c.verificar)}</b></span>
       <span class="cc-linha cc-brutos-linha"><span>só dados brutos</span><b>${fmtn(c.brutos)}</b></span>
     </a>`;
   });
@@ -117,6 +132,32 @@ htl.html`<div class="cc-legenda">${SITUACOES.map((s, i) =>
 
 ::: {.cc-secao}
 [Onde estão]{.cc-chapeu}
+
+## Domínios fitogeográficos
+
+[Proporção das espécies de cada domínio ainda sem DNA. Uma espécie entra em todos os domínios onde ocorre; *exclusivas* são as que só ocorrem naquele domínio.]{.cc-intro}
+
+```{ojs}
+{
+  const linhas = DOMINIOS.map(dom => {
+    const sp = cobertura.filter(d => d.biomas_lista.includes(dom));
+    const excl = sp.filter(d => d.biomas_lista.length === 1);
+    return {dom, total: sp.length, sem: sp.filter(d => d.situacao === "sem DNA").length,
+            excl: excl.length, excl_sem: excl.filter(d => d.situacao === "sem DNA").length};
+  });
+  return htl.html`<ol class="cc-ufs cc-dominios-lista">${linhas.map(d => htl.html`<li>
+    <a class="cc-uf-nome" href="dominios.html#${encodeURIComponent(d.dom)}">${d.dom}</a>
+    <span class="cc-uf-barra"><i style="width:${100 * d.sem / d.total}%"></i></span>
+    <span class="cc-uf-valor">${fmtpct(d.sem / d.total)}</span>
+    <span class="cc-uf-detalhe">${fmtn(d.sem)} de ${fmtn(d.total)} espécies sem DNA · das ${fmtn(d.excl)} exclusivas, ${fmtpct(d.excl_sem / d.excl)} sem DNA</span>
+  </li>`)}</ol>
+  <p class="nota-pequena"><a href="dominios.html">Ver as espécies por domínio e por forma de vida →</a></p>`;
+}
+```
+:::
+
+::: {.cc-secao}
+[As maiores lacunas]{.cc-chapeu}
 
 ## Famílias com mais espécies sem DNA
 
@@ -131,12 +172,13 @@ htl.html`<div class="cc-legenda">${SITUACOES.map((s, i) =>
     d => d.familia)
     .map(([familia, v]) => ({familia, ...v}))
     .sort((a, b) => d3.descending(a.total, b.total)).slice(0, 15);
+  const tam = new Map(d3.rollups(cobertura, v => v.length, d => d.familia));
   const linhas = fam.flatMap(f => [
     {familia: f.familia, grupo: f.grupo, situacao: "sem DNA", n: f.sem},
     {familia: f.familia, grupo: f.grupo, situacao: "a verificar", n: f.verificar}]);
   return Plot.plot({
-    width: Math.min(width, 760), height: fam.length * 26 + 30, marginLeft: 140, marginRight: 40,
-    style: {fontFamily: "Inter, sans-serif", fontSize: "13px"},
+    width: Math.min(width, 760), height: fam.length * 26 + 30, marginLeft: 140, marginRight: 90,
+    style: {fontFamily: "Inter, sans-serif", fontSize: "13px", background: "transparent"},
     x: {label: null, axis: "top", grid: true, tickFormat: fmtn},
     y: {label: null, domain: fam.map(d => d.familia), tickSize: 0},
     color: {domain: ["sem DNA", "a verificar"], range: [COR_SITUACAO[2], COR_SITUACAO[1]]},
@@ -144,7 +186,8 @@ htl.html`<div class="cc-legenda">${SITUACOES.map((s, i) =>
       Plot.barX(linhas, Plot.stackX({x: "n", y: "familia", fill: "situacao",
         order: ["sem DNA", "a verificar"], inset: 1.5, rx: 2, tip: true,
         title: d => `${d.familia} (${d.grupo})\n${d.situacao}: ${fmtn(d.n)}`})),
-      Plot.text(fam, {x: "total", y: "familia", text: d => fmtn(d.total), dx: 6, textAnchor: "start",
+      Plot.text(fam, {x: "total", y: "familia", dx: 6, textAnchor: "start",
+        text: d => `${fmtn(d.total)} (${fmtpct(d.total / tam.get(d.familia))})`,
         fill: "currentColor", fillOpacity: 0.7}),
       Plot.ruleX([0])
     ]
@@ -155,7 +198,8 @@ htl.html`<div class="cc-legenda">${SITUACOES.map((s, i) =>
 ```{ojs}
 htl.html`<div class="cc-legenda">
   <span style="--cor:${COR_SITUACAO[2]}">sem DNA</span>
-  <span style="--cor:${COR_SITUACAO[1]}">a verificar</span></div>`
+  <span style="--cor:${COR_SITUACAO[1]}">a verificar</span></div>
+  <p class="nota-pequena">Entre parênteses, a fração das espécies da família na lacuna.</p>`
 ```
 :::
 
@@ -164,16 +208,17 @@ htl.html`<div class="cc-legenda">
 
 ## Descritas há mais tempo e ainda sem DNA
 
-[Espécies conhecidas pela ciência há mais de um século e que nunca tiveram uma sequência depositada. Clique no nome para adotar.]{.cc-intro}
+[Espécies conhecidas pela ciência há mais de dois séculos e que nunca tiveram uma sequência depositada. Clique no nome para adotar.]{.cc-intro}
 
 ```{ojs}
 {
   const velhas = cobertura.filter(d => d.situacao === "sem DNA" && d.ano_descricao)
-    .sort((a, b) => d3.ascending(a.ano_descricao, b.ano_descricao)).slice(0, 12);
+    .sort((a, b) => d3.ascending(a.ano_descricao, b.ano_descricao) || d3.ascending(a.especie, b.especie))
+    .slice(0, 12);
   return htl.html`<ul class="cc-antigas">${velhas.map(d => htl.html`<li>
     <span class="cc-ano">${d.ano_descricao}</span>
     <span class="cc-quem"><a href="${link_adote(d.especie)}" target="_blank" title="Quero sequenciar"><em>${d.especie}</em></a>
-      <small>${d.grupo_rotulo} · ${d.familia}${d.categoria_ameaca ? ` · ${d.categoria_ameaca}` : ""}</small></span>
+      <small>${d.grupo_rotulo} · ${d.familia}${d.categoria_ameaca ? ` · ${d.categoria_ameaca}` : ""}${d.endemica ? " · endêmica" : ""}</small></span>
   </li>`)}</ul>`;
 }
 ```
@@ -199,7 +244,7 @@ htl.html`<div class="cc-legenda">
 ::: {.cc-faixa}
 ## Adote uma espécie
 
-Tem tecido de uma dessas espécies na coleção do seu laboratório? Diga em público que vai sequenciá-la: evita esforço duplicado e ajuda a achar parceiros.
+Tem material de uma dessas espécies no herbário ou no laboratório? Diga em público que vai sequenciá-la: evita esforço duplicado e ajuda a achar parceiros.
 
 [Como adotar](adote.qmd){.cc-cta .cc-principal}
 :::

@@ -21,7 +21,7 @@ sem_dna = cobertura.filter(d => d.situacao !== "com DNA")
 
 # ${fmtn(sem_dna.length)} espécies esperando a primeira sequência
 
-[Ordenadas por prioridade: **ameaçadas** (CR, EN, VU), depois **DD**, **endêmicas** e as **descritas há mais tempo**. "Sem DNA" quer dizer que nada foi encontrado sob o nome da lista e os sinônimos conhecidos; "a verificar", que há motivo para desconfiar do nome. **Só dados brutos** marca as que já têm leituras de sequenciamento no SRA que ninguém montou: talvez baste montar. Não é prova de ausência: confira a observação de cada espécie.]{.cc-intro}
+[Ordenadas por prioridade: **ameaçadas** (CR, EN, VU na Portaria MMA 1.783/2026), depois **endêmicas** e as **descritas há mais tempo**. "Sem DNA" quer dizer que nada foi encontrado sob o nome da lista e os sinônimos conhecidos; "a verificar", que o DNA está só sob um sinônimo de circunscrição mais ampla. **Só dados brutos** marca as que já têm leituras de sequenciamento no SRA que ninguém montou: talvez baste montar. Não é prova de ausência: confira a observação de cada espécie.]{.cc-intro}
 :::
 
 ::: {.cc-filtros}
@@ -39,6 +39,14 @@ viewof extras = Inputs.checkbox(["endêmicas do Brasil", "ameaçadas (CR, EN, VU
 
 ```{ojs}
 viewof uf = Inputs.select(["Todas", ...UFS], {label: "Estado", value: "Todas"})
+```
+
+```{ojs}
+viewof dominio = Inputs.select(["Todos", ...DOMINIOS], {label: "Domínio", value: "Todos"})
+```
+
+```{ojs}
+viewof forma = Inputs.select(["Todas", ...FORMAS_VIDA, ...SUBSTRATOS], {label: "Forma de vida", value: "Todas"})
 ```
 
 ```{ojs}
@@ -62,11 +70,13 @@ filtradas = {
   return filtra_grupo(cobertura, grupo)
     .filter(d => situacoes.includes(d.situacao))
     .filter(d => uf === "Todas" || d.ufs_lista.includes(uf))
+    .filter(d => dominio === "Todos" || d.biomas_lista.includes(dominio))
+    .filter(d => forma === "Todas" || d.formas_lista.includes(forma) || d.substratos_lista.includes(forma))
     .filter(d => familia === "Todas" || d.familia === familia)
     .filter(d => !extras.includes("endêmicas do Brasil") || d.endemica)
     .filter(d => !extras.includes("ameaçadas (CR, EN, VU)") || d.ameacada)
     .filter(d => !extras.includes("com dados brutos no SRA") || d.brutos)
-    .filter(d => !q || `${d.especie} ${d.familia} ${d.ordem}`.toLowerCase().includes(q))
+    .filter(d => !q || `${d.especie} ${d.familia} ${d.ordem} ${d.autoria ?? ""}`.toLowerCase().includes(q))
     .sort((a, b) => d3.ascending(a.prioridade, b.prioridade) ||
                     d3.ascending(a.ano_descricao ?? 9999, b.ano_descricao ?? 9999) ||
                     d3.ascending(a.especie, b.especie));
@@ -89,7 +99,6 @@ viewof vista = Inputs.radio(["Cartões", "Tabela"], {value: "Cartões"})
 link_bold = e => `https://portal.boldsystems.org/result?query=${encodeURIComponent(e)}[tax]`
 link_genbank = e => `https://www.ncbi.nlm.nih.gov/nuccore/?term=${encodeURIComponent('"' + e + '"[Organism]')}`
 ufs_curto = l => !l.length ? "sem UF" : l.length > 6 ? `${l.length} estados` : l.join(" · ")
-cor_ameaca = c => c?.startsWith("CR") ? "cr" : c?.startsWith("EN") ? "en" : c?.startsWith("VU") ? "vu" : c === "DD" ? "dd" : "outra"
 
 cartao = d => {
   const f = FOTO.get(d.especie);
@@ -98,8 +107,7 @@ cartao = d => {
         <figcaption title="${f.foto_credito}">${f.foto_credito.replace(/^\(c\)\s*/, "© ").replace(/, some rights reserved.*/, "")} · <a href="https://www.inaturalist.org/taxa/${f.inat_id}" target="_blank">iNaturalist</a></figcaption></figure>`
     : htl.html`<figure class="cc-foto cc-sem-foto"><div class="cc-silhueta" style="mask-image:url(assets/silhuetas/${d.grupo}.svg);-webkit-mask-image:url(assets/silhuetas/${d.grupo}.svg)"></div>
         <figcaption>sem foto livre no iNaturalist</figcaption></figure>`;
-  const ameaca = d.categoria_ameaca && d.categoria_ameaca !== "LC" && d.categoria_ameaca !== "NT"
-    ? htl.html`<span class="cc-chip cc-${cor_ameaca(d.categoria_ameaca)}" title="${d.fonte_ameaca ?? ""}">${d.categoria_ameaca}</span>` : "";
+  const ameaca = selo_ameaca(d.categoria_ameaca);
   const acao = d.adocao
     ? htl.html`<span class="cc-chip cc-adotada">${d.adocao}${d.adotada_por ? ` · ${d.adotada_por}` : ""}</span>`
     : d.situacao !== "com DNA"
@@ -110,11 +118,12 @@ cartao = d => {
       <div class="cc-topo">${selo_situacao(d.situacao)}${selo_brutos(d)}${ameaca}${d.endemica ? htl.html`<span class="cc-chip">endêmica</span>` : ""}</div>
       <h3><em>${d.especie}</em></h3>
       <p class="cc-autoria">${d.autoria ?? (d.ano_descricao ?? "")}</p>
-      <p class="cc-onde">${d.grupo_rotulo} · ${d.familia}<br>${ufs_curto(d.ufs_lista)}</p>
+      <p class="cc-onde">${d.grupo_rotulo} · ${d.familia}${d.forma_vida ? ` · ${d.formas_lista.join(", ").toLowerCase()}` : ""}<br>${ufs_curto(d.ufs_lista)}${d.biomas ? ` · ${d.biomas_lista.join(", ")}` : ""}</p>
       <p class="cc-bases"><a href="${link_bold(d.especie)}" target="_blank">BOLD <b>${fmtn(d.n_bold)}</b></a>
         <a href="${link_genbank(d.especie)}" target="_blank">GenBank <b>${d.n_genbank == null ? "?" : fmtn(d.n_genbank)}</b></a>
-        ${d.n_sra > 0 ? htl.html`<a href="${link_sra(d.especie)}" target="_blank">SRA <b>${fmtn(d.n_sra)}</b></a>` : ""}</p>
-      ${d.situacao !== "com DNA" && d.observacao ? htl.html`<p class="cc-obs">${d.observacao}</p>` : ""}
+        ${d.n_sra > 0 ? htl.html`<a href="${link_sra(d.especie)}" target="_blank">SRA <b>${fmtn(d.n_sra)}</b></a>` : ""}
+        ${d.id_ffb ? htl.html`<a href="${link_ffb(d.id_ffb)}" target="_blank" title="Ficha na Flora e Funga do Brasil">Flora e Funga</a>` : ""}</p>
+      ${d.situacao !== "com DNA" ? htl.html`<p class="cc-obs" title="${observacao(d)}">${observacao(d)}</p>` : ""}
       <div class="cc-acao">${acao}</div>
     </div>
   </article>`;
@@ -126,9 +135,10 @@ cartao = d => {
   if (vista === "Tabela") {
     return Inputs.table(filtradas, {
       columns: ["especie", "adocao", "situacao", "grupo_rotulo", "familia", "ano_descricao",
-                "categoria_ameaca", "endemica", "n_bold", "n_genbank", "n_sra", "ufs", "observacao"],
+                "categoria_ameaca", "endemica", "forma_vida", "n_bold", "n_genbank", "n_sra", "ufs", "biomas", "observacao"],
       header: {especie: "Espécie", situacao: "Situação", grupo_rotulo: "Grupo", familia: "Família",
                ano_descricao: "Descrita em", categoria_ameaca: "Ameaça", endemica: "Endêmica",
+               forma_vida: "Forma de vida", biomas: "Domínios",
                n_bold: "BOLD", n_genbank: "GenBank", n_sra: "SRA", ufs: "UFs", observacao: "Observação",
                adocao: ""},
       format: {
@@ -142,12 +152,14 @@ cartao = d => {
         n_sra: (d, i, dados) => d > 0
           ? htl.html`<a href="${link_sra(dados[i].especie)}" target="_blank" title="Leituras brutas no SRA">${fmtn(d)}</a>` : "",
         ufs: d => d ? String(d).replaceAll(";", " ") : "sem dado",
-        observacao: d => htl.html`<span class="nota-pequena">${d ?? ""}</span>`,
+        biomas: d => d ? String(d).replaceAll(";", ", ") : "",
+        forma_vida: d => d ? String(d).replaceAll(";", ", ") : "",
+        observacao: (d, i, dados) => htl.html`<span class="nota-pequena">${observacao(dados[i])}</span>`,
         adocao: (d, i, dados) => d
           ? htl.html`<span class="selo">${d}</span>`
           : htl.html`<a class="btn-adote" href="${link_adote(dados[i].especie)}" target="_blank">adotar</a>`
       },
-      width: {especie: 210, observacao: 380, ufs: 160},
+      width: {especie: 210, observacao: 380, ufs: 160, biomas: 160, forma_vida: 120},
       rows: 30, layout: "fixed", select: false
     });
   }

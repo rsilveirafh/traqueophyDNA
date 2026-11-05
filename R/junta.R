@@ -164,3 +164,16 @@ atualiza_eventos <- function(cob_nova, cob_antiga, destino = "data/eventos.csv")
     distinct()
   gravar_csv(out, destino)
 }
+
+# Versão enxuta de cobertura.csv para o site (~1/3 do tamanho): só as colunas que
+# as páginas usam, e a observação padrão das "sem DNA" fica implícita.
+OBS_SEM_DNA <- "nenhuma sequência depositada no BOLD ou no GenBank sob este nome e os sinônimos conhecidos"
+
+grava_site <- function(cob, destino = "data/site.csv") {
+  cob |>
+    transmute(grupo, familia, ordem, especie, autoria, ano_descricao, endemica_br,
+              categoria_ameaca, ufs, biomas, forma_vida, substrato, situacao, dados_brutos,
+              n_bold, n_genbank, n_sra, id_ffb,
+              observacao = na_if(str_remove(observacao, fixed(OBS_SEM_DNA)) |> str_remove("^; "), "")) |>
+    gravar_csv(destino)
+}

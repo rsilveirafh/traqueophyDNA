@@ -1,0 +1,158 @@
+---
+pagetitle: "Por domínio · traqueophyDNA"
+description: "Espécies de plantas vasculares sem DNA público em cada domínio fitogeográfico do Brasil e por forma de vida."
+format:
+  html:
+    page-layout: full
+---
+
+{{< include _comum.qmd >}}
+
+::: {.cc-cabeca}
+[Por domínio]{.cc-chapeu}
+
+# A lacuna em cada domínio fitogeográfico
+
+[Amazônia, Caatinga, Cerrado, Mata Atlântica, Pampa e Pantanal, como na Flora e Funga do Brasil. Uma espécie entra em todos os domínios onde ocorre; **exclusivas** são as que só ocorrem em um. ${fmtn(sem_dominio)} espécies do recorte não têm domínio informado e ficam fora.]{.cc-intro}
+:::
+
+::: {.cc-filtros}
+```{ojs}
+viewof grupo = Inputs.radio(OPCOES_GRUPO, {label: "Grupo", value: "Todos"})
+```
+
+```{ojs}
+viewof so_exclusivas = Inputs.checkbox(["só as exclusivas do domínio"], {label: "Espécies"})
+```
+
+```{ojs}
+viewof com_verificar = Inputs.checkbox(["somar \"a verificar\""], {label: "Sem DNA"})
+```
+:::
+
+```{ojs}
+//| output: false
+sel = filtra_grupo(cobertura, grupo)
+sem_dominio = sel.filter(d => d.biomas_lista.length === 0).length
+eh_sem = d => d.situacao === "sem DNA" || (com_verificar.length > 0 && d.situacao === "a verificar")
+no_dominio = (d, dom) => d.biomas_lista.includes(dom) && (!so_exclusivas.length || d.biomas_lista.length === 1)
+```
+
+```{ojs}
+//| output: false
+por_dominio = DOMINIOS.map(dom => {
+  const sp = sel.filter(d => no_dominio(d, dom));
+  const sem = sp.filter(eh_sem).length;
+  return {dom, total: sp.length, com: sp.filter(d => d.situacao === "com DNA").length,
+          verificar: sp.filter(d => d.situacao === "a verificar").length,
+          sem_dna: sp.filter(d => d.situacao === "sem DNA").length,
+          brutos: sp.filter(d => eh_sem(d) && d.brutos).length,
+          ameacadas: sp.filter(d => eh_sem(d) && d.ameacada).length,
+          sem, pct: sp.length ? sem / sp.length : 0};
+})
+```
+
+```{ojs}
+//| output: false
+// Domínio escolhido (null = todos). O link da capa traz o domínio no endereço (#Cerrado).
+mutable dom_sel = DOMINIOS.includes(decodeURIComponent(location.hash.slice(1))) ? decodeURIComponent(location.hash.slice(1)) : null
+```
+
+```{ojs}
+//| output: false
+escolhe = dom => {
+  mutable dom_sel = dom;
+  history.replaceState(null, "", dom ? `#${encodeURIComponent(dom)}` : location.pathname);
+  if (dom && window.innerWidth < 992) {
+    setTimeout(() => document.querySelector(".cc-dom-painel")?.scrollIntoView({behavior: "smooth", block: "start"}), 60);
+  }
+}
+```
+
+[Clique em um domínio para ver as espécies e a lacuna por forma de vida.]{.nota-pequena}
+
+::: {.cc-mapa-tabela}
+::: {}
+```{ojs}
+htl.html`<div class="cc-grupos cc-dominios">${por_dominio.map(d => {
+  const barra = [d.com, d.verificar, d.sem_dna].map((v, i) =>
+    htl.html`<i style="width:${100 * v / (d.total || 1)}%;background:${COR_SITUACAO[i]}"></i>`);
+  const el = htl.html`<div class="cc-grupo cc-clicavel ${d.dom === dom_sel ? "cc-ativo" : ""}" tabindex="0" role="button" title="Ver as espécies de ${d.dom}">
+    <h3>${d.dom}</h3>
+    <span class="cc-total">${fmtn(d.total)} espécies${so_exclusivas.length ? " exclusivas" : ""}</span>
+    <div class="cc-barra">${barra}</div>
+    <span class="cc-linha cc-sem"><span>sem DNA${com_verificar.length ? " e a verificar" : ""}</span><b>${fmtn(d.sem)} · ${fmtpct(d.pct)}</b></span>
+    <span class="cc-linha"><span>ameaçadas sem DNA</span><b>${fmtn(d.ameacadas)}</b></span>
+    <span class="cc-linha cc-brutos-linha"><span>só dados brutos</span><b>${fmtn(d.brutos)}</b></span>
+  </div>`;
+  el.onclick = () => escolhe(d.dom === dom_sel ? null : d.dom);
+  el.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); el.onclick(); } };
+  return el;
+})}</div>`
+```
+:::
+
+::: {.cc-dom-painel}
+```{ojs}
+{
+  const no_recorte = d => dom_sel ? no_dominio(d, dom_sel)
+    : d.biomas_lista.length > 0 && (!so_exclusivas.length || d.biomas_lista.length === 1);
+  const lista = sel.filter(d => no_recorte(d) && eh_sem(d)).sort(ordena_prioridade);
+  const voltar = htl.html`<button class="cc-cta cc-pequeno" type="button">← Todos</button>`;
+  voltar.onclick = () => escolhe(null);
+  const d = por_dominio.find(x => x.dom === dom_sel);
+  const titulo = dom_sel ? dom_sel : "Todos os domínios";
+  const resumo = dom_sel
+    ? htl.html`<b>${fmtn(lista.length)}</b> de ${fmtn(d.total)} espécies${so_exclusivas.length ? " exclusivas" : ""} do domínio${com_verificar.length ? "" : htl.html`; outras ${fmtn(d.verificar)} estão a verificar`}.`
+    : htl.html`<b>${fmtn(lista.length)}</b> espécies${so_exclusivas.length ? " exclusivas de um domínio" : " com domínio informado"} ${com_verificar.length ? "sem DNA ou a verificar" : "sem DNA"}. Escolha um domínio ao lado.`;
+  return htl.html`<div class="cc-uf-painel">
+    <div class="cc-uf-topo"><span class="cc-chapeu">${grupo === "Todos" ? "Plantas vasculares" : grupo} · ${com_verificar.length ? "sem DNA e a verificar" : "sem DNA"}</span>${dom_sel ? voltar : ""}</div>
+    <h3>${titulo}</h3>
+    <p class="cc-uf-resumo">${resumo}</p>
+    ${lista.length ? htl.html`<ul class="cc-uf-especies">${lista.slice(0, 500).map(x => item_especie(x, com_verificar.length > 0))}</ul>
+      ${lista.length > 500 ? htl.html`<p class="nota-pequena">Mostrando as 500 primeiras, por prioridade (ameaçadas, endêmicas, descritas há mais tempo).</p>` : ""}` : htl.html`<p>Nenhuma espécie com estes filtros.</p>`}
+    <p class="nota-pequena">Clique no nome para adotar. Para ver todas, filtrar por família ou buscar, use <a href="especies.html">Espécies sem DNA</a>.</p>
+  </div>`;
+}
+```
+:::
+:::
+
+::: {.cc-secao}
+[Forma de vida]{.cc-chapeu}
+
+```{ojs}
+htl.html`<h2>Árvores, ervas, epífitas: quem está mais na lacuna${dom_sel ? ` (${dom_sel})` : ""}</h2>`
+```
+
+[Fração das espécies de cada forma de vida e substrato sem DNA${com_verificar.length ? " ou a verificar" : ""}. Uma espécie pode ter mais de uma forma de vida (erva e subarbusto, por exemplo) e entra em cada uma.]{.cc-intro}
+
+```{ojs}
+{
+  const base = sel.filter(d => dom_sel ? no_dominio(d, dom_sel) : (!so_exclusivas.length || d.biomas_lista.length === 1));
+  const linha = (rotulo, f) => {
+    const sp = base.filter(f);
+    const sem = sp.filter(eh_sem).length;
+    return {rotulo, total: sp.length, sem, pct: sp.length ? sem / sp.length : 0};
+  };
+  const grafico = linhas => Plot.plot({
+    width: Math.min(width, 760), height: linhas.length * 26 + 30, marginLeft: 170, marginRight: 130,
+    style: {fontFamily: "Inter, sans-serif", fontSize: "13px", background: "transparent"},
+    x: {label: null, axis: "top", grid: true, domain: [0, 1], tickFormat: fmtpct},
+    y: {label: null, domain: linhas.map(d => d.rotulo), tickSize: 0},
+    marks: [
+      Plot.barX(linhas, {x: "pct", y: "rotulo", fill: COR_SITUACAO[2], inset: 2, rx: 2, tip: true,
+        title: d => `${d.rotulo}\n${fmtn(d.sem)} de ${fmtn(d.total)} espécies (${fmtpct(d.pct)})`}),
+      Plot.text(linhas, {x: "pct", y: "rotulo", dx: 6, textAnchor: "start",
+        text: d => `${fmtpct(d.pct)} · ${fmtn(d.sem)} de ${fmtn(d.total)}`, fill: "currentColor", fillOpacity: 0.7}),
+      Plot.ruleX([0])
+    ]
+  });
+  const formas = FORMAS_VIDA.map(f => linha(f, d => d.formas_lista.includes(f))).filter(d => d.total >= 10);
+  const substratos = SUBSTRATOS.map(s => linha(s, d => d.substratos_lista.includes(s))).filter(d => d.total >= 10);
+  return htl.html`<h4 class="cc-chapeu">Forma de vida</h4>${grafico(formas)}<h4 class="cc-chapeu">Substrato</h4>${grafico(substratos)}`;
+}
+```
+
+[Forma de vida e substrato como na Flora e Funga do Brasil. Formas com menos de 10 espécies no recorte não aparecem.]{.nota-pequena}
+:::

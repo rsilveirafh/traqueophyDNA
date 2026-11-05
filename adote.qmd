@@ -11,7 +11,7 @@ format: html
 
 # Diga em público: eu vou sequenciar esta espécie
 
-[Centenas de espécies de anfíbios, répteis, aves e mamíferos do Brasil ainda não têm **nenhuma sequência de DNA pública**. Muitas já têm tecido guardado em coleções, esperando alguém com uma pergunta (ou um edital) para sequenciar. Adotar evita esforço duplicado e ajuda a achar parceiros.]{.cc-intro}
+[Milhares de espécies de plantas nativas do Brasil ainda não têm **nenhuma sequência de DNA pública**. Muitas já têm exsicata em herbário ou folha em sílica gel em algum laboratório, esperando alguém com uma pergunta (ou um edital) para sequenciar. Adotar evita esforço duplicado e ajuda a achar parceiros.]{.cc-intro}
 :::
 
 ## Como adotar
@@ -20,7 +20,7 @@ format: html
 ::: {.cc-passo}
 ### Escolha
 
-Encontre a espécie em [Espécies sem DNA](especies.qmd): filtre por estado, grupo, família, endêmicas ou ameaçadas.
+Encontre a espécie em [Espécies sem DNA](especies.qmd): filtre por estado, domínio, grupo, família, forma de vida, endêmicas ou ameaçadas.
 :::
 
 ::: {.cc-passo}
@@ -32,7 +32,7 @@ Abre um formulário no GitHub (precisa de uma conta gratuita) já com o nome da 
 ::: {.cc-passo}
 ### Conte o plano
 
-Instituição, se já há tecido em coleção e o marcador previsto (COI, cyt b, 16S, genoma...).
+Instituição, se já há material (folha em sílica gel, exsicata, banco de DNA) e o marcador previsto (rbcL, matK, ITS2, trnH-psbA, plastoma...).
 :::
 
 ::: {.cc-passo}
@@ -53,13 +53,16 @@ ele registra a adoção por você.
 
 ## Boas práticas
 
-- **Priorize tecido já depositado em coleções científicas.** Este painel não é convite para coletar
-  espécie ameaçada.
+- **Priorize material já depositado em coleções.** Folha em sílica gel e exsicatas recentes costumam
+  render DNA; muitos herbários têm bancos de DNA. Este painel não é convite para coletar espécie
+  ameaçada.
 - **Patrimônio genético:** acesso a material genético de espécie nativa para pesquisa exige cadastro no
-  [SisGen](https://sisgen.gov.br/) (Lei nº 13.123/2015). Coleta exige autorização (SISBIO).
-- **Deposite as sequências** em base pública (BOLD e/ou GenBank) com o voucher citado. Só assim a
-  espécie sai da lista.
-- **Confira o nome antes:** espécies marcadas como "a verificar" podem ter sequências sob nome antigo.
+  [SisGen](https://sisgen.gov.br/) (Lei nº 13.123/2015). Coleta de espécie ameaçada ou em unidade de
+  conservação federal exige autorização no [SISBIO](https://www.gov.br/icmbio/pt-br/servicos/sisbio).
+- **Deposite as sequências** em base pública (BOLD e/ou GenBank) com o voucher citado (herbário e
+  número de tombo), sob o nome aceito na Flora e Funga do Brasil. Só assim a espécie sai da lista.
+- **Confira o nome antes:** espécies marcadas como "a verificar" têm sequências sob um sinônimo de
+  circunscrição mais ampla, que podem ou não ser da espécie da lista.
 - **Veja se já há dados brutos:** espécies com a marca "só dados brutos" têm leituras de
   sequenciamento no SRA que ninguém montou. Montar e depositar um marcador a partir delas pode
   bastar, sem nova coleta.
