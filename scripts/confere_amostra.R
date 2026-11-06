@@ -59,10 +59,23 @@ titulos_nuccore <- function(termo, n = 5) {
   paste(purrr::map_chr(ids, ~ paste0(s$result[[.x]]$accessionversion, ": ", s$result[[.x]]$title)), collapse = " || ")
 }
 
+# O BOLD bloqueou o IP (Cloudflare) depois de algumas centenas de consultas em 3 h
+# na 1ª checagem (2026-11-05). Agora: no máximo 1 consulta a cada 3 s, sem novas
+# tentativas, e a checagem para de consultar o BOLD no primeiro 403 ou 429.
+.bold_parou <- FALSE
 bold_conta <- function(query) {
-  Sys.sleep(0.4)
-  j <- tryCatch(req_base(BOLD) |> req_url_query(query = query, fields = "species", reduce = "false") |>
-                  req_perform() |> resp_body_json(), error = function(e) NULL)
+  if (.bold_parou) return(integer())
+  resp <- tryCatch(
+    request(BOLD) |> req_user_agent(user_agent_txt()) |> req_timeout(120) |>
+      req_throttle(rate = 1 / 3, realm = "bold") |> req_error(is_error = function(r) FALSE) |>
+      req_url_query(query = query, fields = "species", reduce = "false") |> req_perform(),
+    error = function(e) NULL)
+  if (!is.null(resp) && resp_status(resp) %in% c(403, 429)) {
+    .bold_parou <<- TRUE
+    msg("  BOLD respondeu ", resp_status(resp), ": a checagem segue sem o BOLD")
+    return(integer())
+  }
+  j <- if (is.null(resp) || resp_status(resp) >= 400) NULL else tryCatch(resp_body_json(resp), error = function(e) NULL)
   if (is.null(j) || is.null(j$species)) return(integer())
   unlist(j$species)
 }
