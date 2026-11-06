@@ -163,6 +163,20 @@ de regra, não DNA novo: `eventos.csv` voltou a ter só o cabeçalho. Detalhes e
       acesso automatizado à `api/summary`. Afeta o tetrapoDNA também (mesmo endpoint).
       O navegador também é barrado neste IP (bloqueio do IP, não só do script). E-mail ao suporte do
       BOLD enviado em 2026-11-05 (com o Ray ID do Cloudflare); aguardando resposta.
+      **Resposta do suporte (Rebekah, 2026-11-06):** bloqueio temporário pela política de uso justo,
+      que deveria cair em 6 h. **Limite recomendado: abaixo de 20 requisições por minuto.** Para
+      volumes maiores, usar os **Data Packages** do BOLD (todos os dados públicos, para filtrar
+      localmente). Em 2026-11-06 à tarde o IP local seguia bloqueado (API com HTTP 403 e site),
+      e o Ricardo respondeu mandando os Ray IDs novos.
+- [ ] **Regra para qualquer consulta ao BOLD, daqui em diante:** no máximo 15 por minuto (1 a cada
+      4 s), para ficar com folga abaixo dos 20. Nada de retry automático em 403 ou 429: parar no
+      primeiro. Validação ou checagem em lote (muitas espécies) usa os Data Packages, não a API.
+      O pipeline semanal (2 consultas) está dentro do limite.
+      - [x] `scripts/confere_amostra.R`: era `req_throttle(rate = 1 / 3)`, exatamente 20 por
+            minuto. Agora `1 / 4` (2026-11-06).
+      - [x] `R/bold.R` (pipeline semanal): sem novas tentativas e com `req_throttle(rate = 1 / 4)`
+            (2026-11-06).
+      - [ ] Avaliar os Data Packages como fonte da validação (e talvez do próprio pipeline).
 - [ ] **Sinônimo da Flora e Funga que no NCBI é outra planta fora da lista** (*Loranthus dichotomus*
       → *Aetanthus dichotomus*, 1 caso na amostra). `limpa_nomes_ncbi()` só tira o nome quando a
       outra planta está na lista. Avaliar se vale tirar também quando o nome científico do NCBI não

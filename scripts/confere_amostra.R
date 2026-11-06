@@ -60,14 +60,15 @@ titulos_nuccore <- function(termo, n = 5) {
 }
 
 # O BOLD bloqueou o IP (Cloudflare) depois de algumas centenas de consultas em 3 h
-# na 1ª checagem (2026-11-05). Agora: no máximo 1 consulta a cada 3 s, sem novas
+# na 1ª checagem (2026-11-05). O suporte do BOLD recomenda ficar abaixo de 20 por
+# minuto (2026-11-06): no máximo 1 consulta a cada 4 s (15 por minuto), sem novas
 # tentativas, e a checagem para de consultar o BOLD no primeiro 403 ou 429.
 .bold_parou <- FALSE
 bold_conta <- function(query) {
   if (.bold_parou) return(integer())
   resp <- tryCatch(
     request(BOLD) |> req_user_agent(user_agent_txt()) |> req_timeout(120) |>
-      req_throttle(rate = 1 / 3, realm = "bold") |> req_error(is_error = function(r) FALSE) |>
+      req_throttle(rate = 1 / 4, realm = "bold") |> req_error(is_error = function(r) FALSE) |>
       req_url_query(query = query, fields = "species", reduce = "false") |> req_perform(),
     error = function(e) NULL)
   if (!is.null(resp) && resp_status(resp) %in% c(403, 429)) {
