@@ -161,6 +161,8 @@ de regra, não DNA novo: `eventos.csv` voltou a ter só o cabeçalho. Detalhes e
       salvo às 15:21 de 2026-11-05 e avisa em `status.json`; as contagens do BOLD ficam congeladas até
       voltar. Não contornar (trocar user-agent etc.): escrever ao suporte do BOLD perguntando pelo
       acesso automatizado à `api/summary`. Afeta o tetrapoDNA também (mesmo endpoint).
+      O navegador também é barrado neste IP (bloqueio do IP, não só do script). E-mail ao suporte do
+      BOLD enviado em 2026-11-05 (com o Ray ID do Cloudflare); aguardando resposta.
 - [ ] **Sinônimo da Flora e Funga que no NCBI é outra planta fora da lista** (*Loranthus dichotomus*
       → *Aetanthus dichotomus*, 1 caso na amostra). `limpa_nomes_ncbi()` só tira o nome quando a
       outra planta está na lista. Avaliar se vale tirar também quando o nome científico do NCBI não
