@@ -156,9 +156,11 @@ licófitas 941 / 438 / 7; gimnospermas 18 / 7 / 0. Os 390 "eventos" da coleta er
 de regra, não DNA novo: `eventos.csv` voltou a ter só o cabeçalho. Detalhes em
 `validacao/PROTOCOLO.md` (seção 3, "Depois das correções").
 
-- [ ] **BOLD bloqueado (403 do Cloudflare)** para este IP desde a tarde de 2026-11-05: o portal inteiro,
-      não só a API. Provavelmente por causa das centenas de buscas da checagem assistida. A coleta usou
-      o resumo salvo às 15:21 do mesmo dia. Conferir se passa; na Action o IP é outro.
+- [ ] **BOLD bloqueado (403 do Cloudflare)** desde a tarde de 2026-11-05, para o IP local e também
+      para o GitHub Actions (1ª Action, 2026-11-06 00:05): não é só o IP. O pipeline usa o resumo
+      salvo às 15:21 de 2026-11-05 e avisa em `status.json`; as contagens do BOLD ficam congeladas até
+      voltar. Não contornar (trocar user-agent etc.): escrever ao suporte do BOLD perguntando pelo
+      acesso automatizado à `api/summary`. Afeta o tetrapoDNA também (mesmo endpoint).
 - [ ] **Sinônimo da Flora e Funga que no NCBI é outra planta fora da lista** (*Loranthus dichotomus*
       → *Aetanthus dichotomus*, 1 caso na amostra). `limpa_nomes_ncbi()` só tira o nome quando a
       outra planta está na lista. Avaliar se vale tirar também quando o nome científico do NCBI não
@@ -184,3 +186,11 @@ GenBank; os eventos ("ganhou DNA") só contam quem já tinha sido consultado ant
 - [x] Conferido no Edge headless (desktop e iframes de 375 px).
 - [ ] O que o roteiro pede e ficou para depois: link que guarda os filtros (pendência do
       tetrapoDNA também).
+
+## F5: publicação (2026-11-05, noite)
+
+- [x] Repositório público `rsilveirafh/traqueophyDNA`, GitHub Pages por Actions
+      (https://rsilveirafh.github.io/traqueophyDNA/), segredos `NCBI_API_KEY` e `NCBI_EMAIL`.
+- [x] 1ª Action (disparada à mão): coleta em ~4 min (dados frescos; taxdump baixado de novo, GenBank
+      e SRA sem fila), commit de dados e republicação do site. O Pages entrega `data/site.csv` com
+      gzip (1 MB).
